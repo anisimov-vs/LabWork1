@@ -1,9 +1,9 @@
 #include "bitmap.h"
 #include <iostream>
-#include <unistd.h> // For getopt
+#include <unistd.h>
 
 void printHelp() {
-    std::cout << "Usage: program_name [options] [input_image] [output_dir]" << std::endl;
+    std::cout << "Usage: main [options] [input_image] [output_dir]" << std::endl;
     std::cout << "Options:" << std::endl;
     std::cout << "  -i <input_image>    Specify the input image file (default: image.bmp)" << std::endl;
     std::cout << "  -o <output_dir>     Specify the output directory (default: output/)" << std::endl;
