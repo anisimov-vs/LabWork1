@@ -55,11 +55,14 @@ class Bitmap {
         void write(std::string);
 
         void rotate(bool clockwise);
-        void applyGaussianFilter(std::vector<std::vector<float>> kernel);
+        void applyGaussianFilter(std::vector<std::vector<float> > kernel);
 };
 
 
-std::vector<std::vector<float>> generateGaussianKernel(int size, float sigma);
+std::vector<std::vector<float> > generateGaussianKernel(int size, float sigma);
+
+
+std::string getImageName(std::string &imagePath);
 
 
 #endif

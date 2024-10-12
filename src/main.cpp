@@ -5,6 +5,7 @@
 #include <iostream>
 #include <unistd.h>
 
+// Function to print help message
 void printHelp() {
     std::cout << "Usage: main [options] [input_image] [output_dir]" << std::endl;
     std::cout << "Options:" << std::endl;
@@ -16,72 +17,73 @@ void printHelp() {
     std::cout << "Default output_dir: output/" << std::endl;
 }
 
+
 int main(int argc, char* argv[]) {
-    int kernelSize = 5;
-    float sigma = 1.0;
-    std::vector<std::vector<float>> kernel = generateGaussianKernel(kernelSize, sigma);
+    int kernelSize = 5;  // Set the size of the Gaussian kernel
+    float sigma = 1.0;   // Set the standard deviation for the Gaussian kernel
+    std::vector<std::vector<float>> kernel = generateGaussianKernel(kernelSize, sigma);  // Generate the Gaussian kernel
 
     std::string inputImage = "image.bmp";
     std::string outputDir = "output/";
 
     int opt;
+    // Parse command-line options
     while ((opt = getopt(argc, argv, "i:o:h")) != -1) {
         switch (opt) {
             case 'i':
-                inputImage = optarg;
+                inputImage = optarg;  // Set input image file from command-line argument
                 break;
             case 'o':
-                outputDir = optarg;
+                outputDir = optarg;   // Set output directory from command-line argument
                 break;
             case 'h':
-                printHelp();
+                printHelp();          // Display help message and exit
                 return 0;
             default:
-                printHelp();
+                printHelp();          // Display help message and exit with error
                 return 1;
         }
     }
-    // Check for positional arguments
+
+    // Check for positional arguments (input image and output directory)
     if (optind < argc) {
-        inputImage = argv[optind++];
+        inputImage = argv[optind++];  // Set input image file from positional argument
     }
     if (optind < argc) {
-        outputDir = argv[optind++];
+        outputDir = argv[optind++];   // Set output directory from positional argument
     }
 
+    // Ensure the output directory ends with a '/'
     if (outputDir.back() != '/') {
         outputDir += '/';
     }
 
+    std::string imageName = getImageName(inputImage);
+
     Bitmap image;
-    image.load(inputImage);
-    printf("Image loaded\n");
+    image.load(inputImage); 
 
+    // Rotate the image clockwise and apply Gaussian filter
     {
-        Bitmap clockwise_image(image);
-        clockwise_image.rotate(true);
-        printf("Image rotated clockwise\n");
-        clockwise_image.write(outputDir + "rotatedClockwise_image.bmp");
-        printf("Image written\n");
-        clockwise_image.applyGaussianFilter(kernel);
-        printf("Image filtered\n");
-        clockwise_image.write(outputDir + "filteredRotatedClockwise_image.bmp");
-        printf("Image written\n");
+        Bitmap clockwise_image(image);  // Create a copy of the original image
+        clockwise_image.rotate(true);   // Rotate the image clockwise
+        clockwise_image.write(outputDir + "rotatedClockwise_" + imageName);  // Save the rotated image
+        clockwise_image.applyGaussianFilter(kernel);  // Apply Gaussian filter to the rotated image
+        clockwise_image.write(outputDir + "filteredRotatedClockwise_" + imageName);  // Save the filtered image
     }
-    printf("Image rotated clockwise\n");
 
+    std::cout << imageName << " rotated clockwise and filtered" << std::endl;
+
+    // Rotate the image counter-clockwise and apply Gaussian filter
     {
-        Bitmap counterClockwise_image(image);
-        counterClockwise_image.rotate(false);
-        printf("Image rotated counter clockwise\n");
-        counterClockwise_image.write(outputDir + "rotatedCounterClockwise_image.bmp");
-        printf("Image written\n");
-        counterClockwise_image.applyGaussianFilter(kernel);
-        printf("Image filtered\n");
-        counterClockwise_image.write(outputDir + "filteredRotatedCounterClockwise_image.bmp");
-        printf("Image written\n");
+        Bitmap counterClockwise_image(image);  // Create a copy of the original image
+        counterClockwise_image.rotate(false);  // Rotate the image counter-clockwise
+        counterClockwise_image.write(outputDir + "rotatedCounterClockwise_" + imageName);  // Save the rotated image
+        counterClockwise_image.applyGaussianFilter(kernel);  // Apply Gaussian filter to the rotated image
+        counterClockwise_image.write(outputDir + "filteredRotatedCounterClockwise_" + imageName);  // Save the filtered image
     }
-    printf("Image rotated counterclockwise\n");
+
+    std::cout << imageName << " rotated counterclockwise and filtered" << std::endl;
 
     return 0;
 }

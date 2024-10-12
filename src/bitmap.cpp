@@ -1,15 +1,17 @@
 // Anisimov Vasiliy st129629@student.spbu.ru
 // Laboratory Work 1
 
-#include <cstdio>
-#include <iostream>
+#include <cstdint>
 #include <fstream>
+#include <sstream>
+#include <vector>
 #include "bitmap.h"
-#include <cstdlib>
+#include <iostream>
+
 #include <cmath>
 
 
-std::vector<std::vector<float>> generateGaussianKernel(int size, float sigma) {
+std::vector<std::vector<float> > generateGaussianKernel(int size, float sigma) {
     std::vector<std::vector<float> > kernel(size, std::vector<float>(size));
     float sum = 0.0;
     int halfSize = size / 2;
@@ -34,11 +36,23 @@ std::vector<std::vector<float>> generateGaussianKernel(int size, float sigma) {
 }
 
 
+std::string getImageName(std::string &imagePath) {
+    std::string token;
+    std::istringstream tokenStream(imagePath);
+    std::string imageName;
+    while (std::getline(tokenStream, token, '/')){
+        imageName = token;
+    }
+    
+    return imageName;
+}
+
+
 void Bitmap::load(std::string filename) {
     std::ifstream file(filename, std::ios::binary);
 
     if (!file.is_open()) {
-        std::cout << "Error: Could not open file " << filename << std::endl;
+        std::cerr << "Error: Could not open file " << filename << std::endl;
         exit(1);
     }
 
@@ -46,7 +60,7 @@ void Bitmap::load(std::string filename) {
     file.read(reinterpret_cast<char*>(fileType), 2);
     
     if ((fileType[0] != 'B') && (fileType[1] != 'M')) {
-        std::cout << "Error: File is not a BMP file" << std::endl;
+        std::cerr << "Error: File is not a BMP file" << std::endl;
         exit(1);
     }
 
@@ -65,7 +79,7 @@ void Bitmap::load(std::string filename) {
             int blue = file.get();
             int green = file.get();
             int red = file.get();
-            //std::cout << blue << std::endl;
+            
             pixelRow.push_back(Pixel(red, green, blue));
 
         }
@@ -80,7 +94,6 @@ void Bitmap::load(std::string filename) {
 
 
 void Bitmap::write(std::string fileName) {
-    std::cout << fileName << std::endl;
     std::ofstream file(fileName, std::ios::binary);
     
     file.write("BM", 2);
@@ -147,7 +160,7 @@ void Bitmap::rotate(bool clockwise) {
     pixels = rotatedPixels;
 }
 
-void Bitmap::applyGaussianFilter(std::vector<std::vector<float>> kernel) {
+void Bitmap::applyGaussianFilter(std::vector<std::vector<float> > kernel) {
     int32_t width = pixels.size();
     int32_t heigth = pixels[0].size();
 

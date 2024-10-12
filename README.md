@@ -14,7 +14,7 @@ This project is a C++ program that reads an image from a file, rotates it clockw
 
 ### Files
 
-- `src/main.cpp`: The main file containing the main function and other functions for reading, writing, rotating, and filtering images.
+- `src/main.cpp`: The main file containing the main function that reads an image from a file, rotates it clockwise and counterclockwise, and applies a Gaussian filter to rotated images.
 - `src/bitmap.h`: The header file containing the structure definitions for the BMP file format and the Bitmap class.
 - `src/bitmap.cpp`: The implementation file containing the functions for reading, writing, rotating, and filtering images.
 - `Makefile`: The makefile for building the program.
