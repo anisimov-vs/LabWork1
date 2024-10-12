@@ -1,7 +1,8 @@
 # Laboratory Work 1
 
 ## Author
-Vasily Anisimov, Group 24.B81-mm
+
+Анисимов Василий Сергеевич, группа 24.Б81-мм
 
 ## Contacts
 
@@ -27,7 +28,7 @@ make
 ### Run
 
 ```
-./main -i image.bmp -o output/
+./main image.bmp output/
 ```
 
 ### Usage
@@ -41,8 +42,4 @@ Options:
 If input_image and output_dir are not provided, default values are used.
 Default input_image: image.bmp
 Default output_dir: output/
-```
-
-```
-./main -i input.bmp -o output/
 ```
