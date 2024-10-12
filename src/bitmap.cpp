@@ -3,6 +3,32 @@
 #include <fstream>
 #include "bitmap.h"
 #include <cstdlib>
+#include <cmath>
+
+
+std::vector<std::vector<float>> generateGaussianKernel(int size, float sigma) {
+    std::vector<std::vector<float> > kernel(size, std::vector<float>(size));
+    float sum = 0.0;
+    int halfSize = size / 2;
+
+    for (int x = -halfSize; x <= halfSize; x++) {
+        for (int y = -halfSize; y <= halfSize; y++) {
+            float exponent = -(x * x + y * y) / (2 * sigma * sigma);
+            float value = exp(exponent) / (2 * M_PI * sigma * sigma);
+            kernel[x + halfSize][y + halfSize] = value;
+            sum += value;
+        }
+    }
+
+    // Нормализация ядра
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            kernel[i][j] /= sum;
+        }
+    }
+
+    return kernel;
+}
 
 
 void Bitmap::load(std::string filename) {
@@ -51,15 +77,16 @@ void Bitmap::load(std::string filename) {
 
 
 void Bitmap::write(std::string fileName) {
+    std::cout << fileName << std::endl;
     std::ofstream file(fileName, std::ios::binary);
-
+    
     file.write("BM", 2);
 
     bmpFileHeader header = { 0 };
 
     header.bmpOffset = 2 + sizeof(bmpFileHeader) + sizeof(bmpFileDibInfo);
     header.fileSize = header.bmpOffset + (pixels.size() * 3 + pixels[0].size() % 4) * pixels.size();
-
+    
     file.write(reinterpret_cast<char*>(&header), sizeof(bmpFileHeader));
     
     bmpFileDibInfo dibInfo = { 0 };
@@ -95,4 +122,57 @@ void Bitmap::write(std::string fileName) {
     }
 
     file.close();
+}
+
+void Bitmap::rotate(bool clockwise) {
+    int32_t width = pixels.size();
+    int32_t heigth = pixels[0].size();
+
+    std::vector <std::vector <Pixel> > rotatedPixels(heigth, std::vector <Pixel>(width));
+
+    for (int32_t x = 0; x < width; x++) {
+        
+        for (int32_t y = 0; y < heigth; y++) {
+            if (clockwise) {
+                rotatedPixels[y][width - x - 1] = pixels[x][y];
+            } else {
+                rotatedPixels[heigth - y - 1][x] = pixels[x][y];
+            }
+        }
+    }
+    
+    pixels = rotatedPixels;
+}
+
+void Bitmap::applyGaussianFilter(std::vector<std::vector<float>> kernel) {
+    int32_t width = pixels.size();
+    int32_t heigth = pixels[0].size();
+
+    int halfKernelSize = kernel.size() / 2;
+
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < heigth; y++) {
+            float red = 0.0, green = 0.0, blue = 0.0;
+
+            for (int i = -halfKernelSize; i <= halfKernelSize; i++) {
+                for (int j = -halfKernelSize; j <= halfKernelSize; j++) {
+                    int nx = x + i;
+                    int ny = y + j;
+
+                    if (nx < 0) nx = 0;
+                    if (nx >= width) nx = width - 1;
+                    if (ny < 0) ny = 0;
+                    if (ny >= heigth) ny = heigth -1;
+
+                    red += pixels[nx][ny].red * kernel[i + halfKernelSize][j + halfKernelSize];
+                    green += pixels[nx][ny].green * kernel[i + halfKernelSize][j + halfKernelSize];
+                    blue += pixels[nx][ny].blue * kernel[i + halfKernelSize][j + halfKernelSize];
+                }
+            }
+
+            pixels[x][y].red = uint8_t(red);
+            pixels[x][y].green = uint8_t(green);
+            pixels[x][y].green = uint8_t(green);
+        }
+    }
 }

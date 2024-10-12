@@ -46,15 +46,17 @@ class Bitmap {
         Bitmap(const Bitmap& other) : pixels(other.pixels) { }
         Bitmap(int32_t width, int32_t height) : pixels(width, std::vector<Pixel>(height)) { }
 
+        ~Bitmap() { pixels.clear(); }
+
         void load(std::string);
         void write(std::string);
 
-        //bool isImage();
-
-        //PixelMatrix toPixelMatrix();
-
-        //void fromPixelMatrix(const PixelMatrix &);
+        void rotate(bool clockwise);
+        void applyGaussianFilter(std::vector<std::vector<float>> kernel);
 };
+
+
+std::vector<std::vector<float>> generateGaussianKernel(int size, float sigma);
 
 
 #endif
