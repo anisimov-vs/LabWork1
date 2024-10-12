@@ -1,31 +1,29 @@
-// Anisimov Vasiliy st129629@student.spbu.ru
-// Laboratory Work 1
-
 #include <cstdint>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include "bitmap.h"
 #include <iostream>
-
 #include <cmath>
 
-
+// Function to generate a Gaussian kernel
 std::vector<std::vector<float> > generateGaussianKernel(int size, float sigma) {
     std::vector<std::vector<float> > kernel(size, std::vector<float>(size));
     float sum = 0.0;
     int halfSize = size / 2;
 
+    // Calculate the Gaussian values for each position in the kernel
     for (int x = -halfSize; x <= halfSize; x++) {
         for (int y = -halfSize; y <= halfSize; y++) {
             float exponent = -(x * x + y * y) / (2 * sigma * sigma);
             float value = exp(exponent) / (2 * M_PI * sigma * sigma);
+
             kernel[x + halfSize][y + halfSize] = value;
             sum += value;
         }
     }
 
-    // Нормализация ядра
+    // Normalize the kernel to ensure the sum of all values is 1
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             kernel[i][j] /= sum;
@@ -35,7 +33,7 @@ std::vector<std::vector<float> > generateGaussianKernel(int size, float sigma) {
     return kernel;
 }
 
-
+// Extract the image name from a full path
 std::string getImageName(std::string &imagePath) {
     std::string token;
     std::istringstream tokenStream(imagePath);
@@ -47,7 +45,7 @@ std::string getImageName(std::string &imagePath) {
     return imageName;
 }
 
-
+// Load a BMP image from a file
 void Bitmap::load(std::string filename) {
     std::ifstream file(filename, std::ios::binary);
 
@@ -72,6 +70,7 @@ void Bitmap::load(std::string filename) {
 
     file.seekg(header.bmpOffset, std::ios::beg);
 
+    // Read pixel data from the file
     for (int x = 0; x < dibInfo.height; x++) {
         std::vector <Pixel> pixelRow;
 
@@ -81,18 +80,17 @@ void Bitmap::load(std::string filename) {
             int red = file.get();
             
             pixelRow.push_back(Pixel(red, green, blue));
-
         }
 
+        // Handle padding bytes
         file.seekg(dibInfo.width % 4, std::ios::cur);
 
         pixels.insert(pixels.begin(), pixelRow);
-        
     }
     file.close();
 }
 
-
+// Write the BMP image to a file
 void Bitmap::write(std::string fileName) {
     std::ofstream file(fileName, std::ios::binary);
     
@@ -121,6 +119,7 @@ void Bitmap::write(std::string fileName) {
     
     file.write(reinterpret_cast<char*>(&dibInfo), sizeof(bmpFileDibInfo));
 
+    // Write pixel data to the file
     for (int x = pixels.size() - 1; x >= 0; x--) {
         const std::vector <Pixel> & rowPixels = pixels[x];
         
@@ -132,6 +131,7 @@ void Bitmap::write(std::string fileName) {
             file.put((unsigned char)(pixel.red));
         }
 
+        // Write padding bytes
         for (int i = 0; i < rowPixels.size() % 4; i++) {
             file.put(0);
         }
@@ -140,6 +140,7 @@ void Bitmap::write(std::string fileName) {
     file.close();
 }
 
+// Rotate the image 90 degrees clockwise or counterclockwise
 void Bitmap::rotate(bool clockwise) {
     int32_t width = pixels.size();
     int32_t heigth = pixels[0].size();
@@ -160,6 +161,7 @@ void Bitmap::rotate(bool clockwise) {
     pixels = rotatedPixels;
 }
 
+// Apply a Gaussian filter to the image
 void Bitmap::applyGaussianFilter(std::vector<std::vector<float> > kernel) {
     int32_t width = pixels.size();
     int32_t heigth = pixels[0].size();
@@ -170,6 +172,7 @@ void Bitmap::applyGaussianFilter(std::vector<std::vector<float> > kernel) {
         for (int y = 0; y < heigth; y++) {
             float red = 0.0, green = 0.0, blue = 0.0;
 
+            // Convolve the kernel with the image
             for (int i = -halfKernelSize; i <= halfKernelSize; i++) {
                 for (int j = -halfKernelSize; j <= halfKernelSize; j++) {
                     int nx = x + i;
