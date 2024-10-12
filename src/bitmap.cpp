@@ -1,3 +1,6 @@
+// Anisimov Vasiliy st129629@student.spbu.ru
+// Laboratory Work 1
+
 #include <cstdio>
 #include <iostream>
 #include <fstream>
