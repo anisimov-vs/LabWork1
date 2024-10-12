@@ -1,8 +1,11 @@
+// Anisimov Vasiliy st129629@student.spbu.ru
+// Laboratory Work 1
+
+#include "bitmap.h"
 #include <cstdint>
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include "bitmap.h"
 #include <iostream>
 #include <cmath>
 
@@ -38,7 +41,8 @@ std::string getImageName(std::string &imagePath) {
     std::string token;
     std::istringstream tokenStream(imagePath);
     std::string imageName;
-    while (std::getline(tokenStream, token, '/')){
+
+    while (std::getline(tokenStream, token, '/')) {
         imageName = token;
     }
     
@@ -87,6 +91,7 @@ void Bitmap::load(std::string filename) {
 
         pixels.insert(pixels.begin(), pixelRow);
     }
+
     file.close();
 }
 
@@ -148,7 +153,6 @@ void Bitmap::rotate(bool clockwise) {
     std::vector <std::vector <Pixel> > rotatedPixels(heigth, std::vector <Pixel>(width));
 
     for (int32_t x = 0; x < width; x++) {
-        
         for (int32_t y = 0; y < heigth; y++) {
             if (clockwise) {
                 rotatedPixels[y][width - x - 1] = pixels[x][y];
