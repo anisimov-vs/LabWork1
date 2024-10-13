@@ -43,13 +43,16 @@ class Pixel {
 
 // Class representing a Bitmap image
 class Bitmap {
-    public:
+    private:
+        bool isGrayscale;
+
         std::vector<std::vector<Pixel>> pixels; // 2D vector storing the pixels of the image
 
+    public:
         Bitmap() { } // Default constructor
 
         // Copy constructor
-        Bitmap(const Bitmap& other) : pixels(other.pixels) { }
+        Bitmap(const Bitmap& other) : pixels(other.pixels), isGrayscale(other.isGrayscale) { }
 
         // Constructor initializing a bitmap with given width and height
         Bitmap(int32_t width, int32_t height) : pixels(width, std::vector<Pixel>(height)) { }
@@ -74,5 +77,9 @@ std::vector<std::vector<float>> generateGaussianKernel(int size, float sigma);
 
 // Function to extract the image name from a file path
 std::string getImageName(std::string &imagePath);
+
+void printHelp();
+
+std::string *readArgs(int argc, char* argv[]);
 
 #endif

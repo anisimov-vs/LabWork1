@@ -8,6 +8,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <unistd.h>
 
 // Function to generate a Gaussian kernel
 std::vector<std::vector<float> > generateGaussianKernel(int size, float sigma) {
@@ -72,24 +73,70 @@ void Bitmap::load(std::string filename) {
     bmpFileDibInfo dibInfo;
     file.read(reinterpret_cast<char*>(&dibInfo), sizeof(bmpFileDibInfo));
 
+    // Seek to the pixel data start position
     file.seekg(header.bmpOffset, std::ios::beg);
 
-    // Read pixel data from the file
-    for (int x = 0; x < dibInfo.height; x++) {
-        std::vector <Pixel> pixelRow;
+    // If it's a 1-bit monochrome image
+    if (dibInfo.bitsPerPixel == 1) {
+        isGrayscale = true;
 
-        for (int y = 0; y < dibInfo.width; y++) {
-            int blue = file.get();
-            int green = file.get();
-            int red = file.get();
-            
-            pixelRow.push_back(Pixel(red, green, blue));
+        // Read pixel data (each byte contains 8 pixels, packed as bits)
+        for (int x = 0; x < dibInfo.height; x++) {
+            std::vector<Pixel> pixelRow;
+            for (int y = 0; y < (dibInfo.width + 7) / 8; y++) {
+                uint8_t byte = file.get();  // Read one byte (8 pixels)
+                for (int bit = 0; bit < 8 && y * 8 + bit < dibInfo.width; bit++) {
+
+                    uint8_t colorIndex = (byte >> (7 - bit)) & 0x01;
+
+                    Pixel pixel(0, 0, 0);
+                    if (colorIndex == 0) {
+                        pixel.blue = 255;
+                        pixel.green = 255;
+                        pixel.red = 255;
+                    }
+                    pixelRow.push_back(pixel);
+                }
+            }
+            // Handle padding bytes (each row must be a multiple of 4 bytes)
+            file.seekg((4 - ((dibInfo.width + 7) / 8) % 4) % 4, std::ios::cur);
+
+            pixels.insert(pixels.begin(), pixelRow);
         }
+    } 
+    // Handle 8-bit grayscale
+    else if (dibInfo.bitsPerPixel == 8) {
+        isGrayscale = true;
+        std::vector<std::vector<uint8_t>> palette(256, std::vector<uint8_t>(4));
 
-        // Handle padding bytes
-        file.seekg(dibInfo.width % 4, std::ios::cur);
-
-        pixels.insert(pixels.begin(), pixelRow);
+        for (int x = 0; x < dibInfo.height; x++) {
+            std::vector<Pixel> pixelRow;
+            for (int y = 0; y < dibInfo.width; y++) {
+                uint8_t grayValue = file.get();
+                Pixel pixel(grayValue, grayValue, grayValue);
+                pixelRow.push_back(pixel);
+            }
+            file.seekg(dibInfo.width % 4, std::ios::cur);
+            pixels.insert(pixels.begin(), pixelRow);
+        }
+    }
+    // Handle 24-bit RGB
+    else if (dibInfo.bitsPerPixel == 24) {
+        isGrayscale = false;
+        for (int x = 0; x < dibInfo.height; x++) {
+            std::vector<Pixel> pixelRow;
+            for (int y = 0; y < dibInfo.width; y++) {
+                int blue = file.get();
+                int green = file.get();
+                int red = file.get();
+                pixelRow.push_back(Pixel(red, green, blue));
+            }
+            file.seekg(dibInfo.width % 4, std::ios::cur);
+            pixels.insert(pixels.begin(), pixelRow);
+        }
+    } else {
+        std::cerr << "Error: Unsupported BMP format (only 1-bit, 8-bit grayscale, and 24-bit RGB are supported)" << std::endl;
+        exit(1);
     }
 
     file.close();
@@ -98,42 +145,66 @@ void Bitmap::load(std::string filename) {
 // Write the BMP image to a file
 void Bitmap::write(std::string fileName) {
     std::ofstream file(fileName, std::ios::binary);
-    
     file.write("BM", 2);
-
-    bmpFileHeader header = { 0 };
-
+    
+    bmpFileHeader header = {0};
     header.bmpOffset = 2 + sizeof(bmpFileHeader) + sizeof(bmpFileDibInfo);
-    header.fileSize = header.bmpOffset + (pixels.size() * 3 + pixels[0].size() % 4) * pixels.size();
     
+    if (isGrayscale) {
+        header.bmpOffset += 256 * 4;  // Grayscale palette (256 colors, 4 bytes each)
+        header.fileSize = header.bmpOffset + (pixels.size() * pixels[0].size() + pixels[0].size() % 4) * pixels.size();
+    } else {
+        header.fileSize = header.bmpOffset + (pixels.size() * 3 + pixels[0].size() % 4) * pixels.size();
+    }
+
     file.write(reinterpret_cast<char*>(&header), sizeof(bmpFileHeader));
-    
-    bmpFileDibInfo dibInfo = { 0 };
-    
+
+    bmpFileDibInfo dibInfo = {0};
     dibInfo.headerSize = sizeof(bmpFileDibInfo);
     dibInfo.width = pixels[0].size();
     dibInfo.height = pixels.size();
     dibInfo.planes = 1;
-    dibInfo.bitsPerPixel = 24;
-    dibInfo.compression = 0;
-    dibInfo.imageSize = dibInfo.width * dibInfo.height * 3;
+    
+    if (isGrayscale) {
+        dibInfo.bitsPerPixel = 8;
+        dibInfo.compression = 0;
+        dibInfo.imageSize = dibInfo.width * dibInfo.height;
+    } else {
+        dibInfo.bitsPerPixel = 24;
+        dibInfo.imageSize = dibInfo.width * dibInfo.height * 3;
+    }
     dibInfo.xPixelsPerMeter = 2835;
     dibInfo.yPixelsPerMeter = 2835;
-    dibInfo.colorsUsed = 0;
+    dibInfo.colorsUsed = isGrayscale ? 256 : 0;
     dibInfo.importantColors = 0;
-    
+
     file.write(reinterpret_cast<char*>(&dibInfo), sizeof(bmpFileDibInfo));
 
-    // Write pixel data to the file
+    // If grayscale, write the palette (256 grayscale colors)
+    if (isGrayscale) {
+        for (int i = 0; i < 256; i++) {
+            file.put(i); // Blue
+            file.put(i); // Green
+            file.put(i); // Red
+            file.put(0); // Reserved
+        }
+    }
+
+    // Write pixel data
     for (int x = pixels.size() - 1; x >= 0; x--) {
-        const std::vector <Pixel> & rowPixels = pixels[x];
-        
+        const std::vector<Pixel> &rowPixels = pixels[x];
         for (int y = 0; y < pixels[x].size(); y++) {
-            const Pixel& pixel = rowPixels[y];
-            
-            file.put((unsigned char)(pixel.blue));
-            file.put((unsigned char)(pixel.green));
-            file.put((unsigned char)(pixel.red));
+            const Pixel &pixel = rowPixels[y];
+            if (isGrayscale) {
+                // Write grayscale pixel (map RGB to a single grayscale value)
+                uint8_t grayValue = static_cast<uint8_t>(0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue);
+                file.put(grayValue);
+            } else {
+                // Write color pixel (RGB)
+                file.put((unsigned char)(pixel.blue));
+                file.put((unsigned char)(pixel.green));
+                file.put((unsigned char)(pixel.red));
+            }
         }
 
         // Write padding bytes
@@ -144,6 +215,7 @@ void Bitmap::write(std::string fileName) {
 
     file.close();
 }
+
 
 // Rotate the image 90 degrees clockwise or counterclockwise
 void Bitmap::rotate(bool clockwise) {
@@ -198,4 +270,60 @@ void Bitmap::applyGaussianFilter(std::vector<std::vector<float> > kernel) {
             pixels[x][y].green = uint8_t(green);
         }
     }
+}
+
+// Function to print help message
+void printHelp() {
+    std::cout << "Usage: main [options] [input_image] [output_dir]" << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "  -i <input_image>    Specify the input image file (default: image.bmp)" << std::endl;
+    std::cout << "  -o <output_dir>     Specify the output directory (default: output/)" << std::endl;
+    std::cout << "  -h                  Display this help message" << std::endl;
+    std::cout << "If input_image and output_dir are not provided, default values are used." << std::endl;
+    std::cout << "Default input_image: image.bmp" << std::endl;
+    std::cout << "Default output_dir: output/" << std::endl;
+}
+
+std::string *readArgs(int argc, char* argv[]) {
+    std::string inputImage = "image.bmp";
+    std::string outputDir = "output/";
+
+    int opt;
+    // Parse command-line options
+    while ((opt = getopt(argc, argv, "i:o:h")) != -1) {
+        switch (opt) {
+            case 'i':
+                inputImage = optarg;  // Set input image file from command-line argument
+                break;
+            case 'o':
+                outputDir = optarg;   // Set output directory from command-line argument
+                break;
+            case 'h':
+                printHelp();          // Display help message and exit
+                return nullptr;
+            default:
+                printHelp();          // Display help message and exit with error
+                return nullptr;
+        }
+    }
+
+    // Check for positional arguments (input image and output directory)
+    if (optind < argc) {
+        inputImage = argv[optind++];  // Set input image file from positional argument
+    }
+    if (optind < argc) {
+        outputDir = argv[optind++];   // Set output directory from positional argument
+    }
+
+    // Ensure the output directory ends with a '/'
+    if (outputDir.back() != '/') {
+        outputDir += '/';
+    }
+
+    // Allocate a dynamic array of two strings to store the results
+    std::string *result = new std::string[2];
+    result[0] = inputImage;
+    result[1] = outputDir;
+
+    return result;  // Return the pointer to the array
 }
