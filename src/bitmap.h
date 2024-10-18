@@ -48,6 +48,12 @@ class Bitmap {
 
         std::vector<std::vector<Pixel>> pixels; // 2D vector storing the pixels of the image
 
+        bmpFileHeader header = {0};
+
+        bmpFileDibInfo dibInfo = {0};
+
+        std::vector<std::vector<uint8_t>> palette;
+
     public:
         Bitmap() { } // Default constructor
 
@@ -61,6 +67,8 @@ class Bitmap {
 
         // Method to load a bitmap from a file
         void load(std::string);
+
+        uint8_t findClosestPaletteIndex(const Pixel &pixel);
 
         // Method to write a bitmap to a file
         void write(std::string);

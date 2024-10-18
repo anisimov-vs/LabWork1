@@ -73,71 +73,111 @@ void Bitmap::load(std::string filename) {
     bmpFileDibInfo dibInfo;
     file.read(reinterpret_cast<char*>(&dibInfo), sizeof(bmpFileDibInfo));
 
-    // Seek to the pixel data start position
-    file.seekg(header.bmpOffset, std::ios::beg);
+    // Check if the DIB header size indicates a V3 or later header
+    //if (dibInfo.headerSize >= 56) {
+        std::cout << dibInfo.headerSize << " " << dibInfo.bitsPerPixel << std::endl;
+        // Read the color masks if present
+        uint32_t redMask = 0x00FF0000;
+        uint32_t greenMask = 0x0000FF00;
+        uint32_t blueMask = 0x000000FF;
+        uint32_t alphaMask = 0xFF000000;
 
-    // If it's a 1-bit monochrome image
-    if (dibInfo.bitsPerPixel == 1) {
-        isGrayscale = true;
+        if (dibInfo.headerSize == 56 || dibInfo.headerSize == 108 || dibInfo.headerSize == 124) {
+            file.read(reinterpret_cast<char*>(&redMask), sizeof(redMask));
+            file.read(reinterpret_cast<char*>(&greenMask), sizeof(greenMask));
+            file.read(reinterpret_cast<char*>(&blueMask), sizeof(blueMask));
+            if (dibInfo.headerSize >= 108) {
+                file.read(reinterpret_cast<char*>(&alphaMask), sizeof(alphaMask));
+            }
+        }
 
-        // Read pixel data (each byte contains 8 pixels, packed as bits)
-        for (int x = 0; x < dibInfo.height; x++) {
-            std::vector<Pixel> pixelRow;
-            for (int y = 0; y < (dibInfo.width + 7) / 8; y++) {
-                uint8_t byte = file.get();  // Read one byte (8 pixels)
-                for (int bit = 0; bit < 8 && y * 8 + bit < dibInfo.width; bit++) {
+        // Seek to the pixel data start position
+        file.seekg(header.bmpOffset, std::ios::beg);
 
-                    uint8_t colorIndex = (byte >> (7 - bit)) & 0x01;
+        // Handle 16-bit BMP with custom masks
+        if (dibInfo.bitsPerPixel == 16) {
+            isGrayscale = false;
+            for (int x = 0; x < dibInfo.height; x++) {
+                std::vector<Pixel> pixelRow;
+                for (int y = 0; y < dibInfo.width; y++) {
+                    uint16_t pixelValue = (file.get() | (file.get() << 8));
+                    uint8_t blue = ((pixelValue & blueMask) >> __builtin_ctz(blueMask)) * (255.0 / ((1 << __builtin_popcount(blueMask)) - 1));
+                    uint8_t green = ((pixelValue & greenMask) >> __builtin_ctz(greenMask)) * (255.0 / ((1 << __builtin_popcount(greenMask)) - 1));
+                    uint8_t red = ((pixelValue & redMask) >> __builtin_ctz(redMask)) * (255.0 / ((1 << __builtin_popcount(redMask)) - 1));
+                    pixelRow.push_back(Pixel(red, green, blue));
+                }
+                file.seekg(dibInfo.width % 4, std::ios::cur);
+                pixels.insert(pixels.begin(), pixelRow);
+            }
+        }
 
-                    Pixel pixel(0, 0, 0);
-                    if (colorIndex == 0) {
-                        pixel.blue = 255;
-                        pixel.green = 255;
-                        pixel.red = 255;
+    //} else {
+        // Seek to the pixel data start position
+        //file.seekg(header.bmpOffset, std::ios::beg);
+
+        // If it's a 1-bit monochrome image
+        else if (dibInfo.bitsPerPixel == 1) {
+            isGrayscale = true;
+
+            // Read pixel data (each byte contains 8 pixels, packed as bits)
+            for (int x = 0; x < dibInfo.height; x++) {
+                std::vector<Pixel> pixelRow;
+                for (int y = 0; y < (dibInfo.width + 7) / 8; y++) {
+                    uint8_t byte = file.get();  // Read one byte (8 pixels)
+                    for (int bit = 0; bit < 8 && y * 8 + bit < dibInfo.width; bit++) {
+
+                        uint8_t colorIndex = (byte >> (7 - bit)) & 0x01;
+
+                        Pixel pixel(0, 0, 0);
+                        if (colorIndex == 0) {
+                            pixel.blue = 255;
+                            pixel.green = 255;
+                            pixel.red = 255;
+                        }
+                        pixelRow.push_back(pixel);
                     }
+                }
+                // Handle padding bytes (each row must be a multiple of 4 bytes)
+                file.seekg((4 - ((dibInfo.width + 7) / 8) % 4) % 4, std::ios::cur);
+
+                pixels.insert(pixels.begin(), pixelRow);
+            }
+        } 
+        // Handle 8-bit grayscale
+        else if (dibInfo.bitsPerPixel == 8) {
+            isGrayscale = true;
+            std::vector<std::vector<uint8_t>> palette(256, std::vector<uint8_t>(4));
+
+            for (int x = 0; x < dibInfo.height; x++) {
+                std::vector<Pixel> pixelRow;
+                for (int y = 0; y < dibInfo.width; y++) {
+                    uint8_t grayValue = file.get();
+                    Pixel pixel(grayValue, grayValue, grayValue);
                     pixelRow.push_back(pixel);
                 }
+                file.seekg(dibInfo.width % 4, std::ios::cur);
+                pixels.insert(pixels.begin(), pixelRow);
             }
-            // Handle padding bytes (each row must be a multiple of 4 bytes)
-            file.seekg((4 - ((dibInfo.width + 7) / 8) % 4) % 4, std::ios::cur);
-
-            pixels.insert(pixels.begin(), pixelRow);
         }
-    } 
-    // Handle 8-bit grayscale
-    else if (dibInfo.bitsPerPixel == 8) {
-        isGrayscale = true;
-        std::vector<std::vector<uint8_t>> palette(256, std::vector<uint8_t>(4));
-
-        for (int x = 0; x < dibInfo.height; x++) {
-            std::vector<Pixel> pixelRow;
-            for (int y = 0; y < dibInfo.width; y++) {
-                uint8_t grayValue = file.get();
-                Pixel pixel(grayValue, grayValue, grayValue);
-                pixelRow.push_back(pixel);
+        // Handle 24-bit RGB
+        else if (dibInfo.bitsPerPixel == 24) {
+            isGrayscale = false;
+            for (int x = 0; x < dibInfo.height; x++) {
+                std::vector<Pixel> pixelRow;
+                for (int y = 0; y < dibInfo.width; y++) {
+                    int blue = file.get();
+                    int green = file.get();
+                    int red = file.get();
+                    pixelRow.push_back(Pixel(red, green, blue));
+                }
+                file.seekg(dibInfo.width % 4, std::ios::cur);
+                pixels.insert(pixels.begin(), pixelRow);
             }
-            file.seekg(dibInfo.width % 4, std::ios::cur);
-            pixels.insert(pixels.begin(), pixelRow);
+        } else {
+            std::cerr << "Error: Unsupported BMP format (only 1-bit, 8-bit grayscale, 16-bit, and 24-bit RGB are supported)" << std::endl;
+            exit(1);
         }
-    }
-    // Handle 24-bit RGB
-    else if (dibInfo.bitsPerPixel == 24) {
-        isGrayscale = false;
-        for (int x = 0; x < dibInfo.height; x++) {
-            std::vector<Pixel> pixelRow;
-            for (int y = 0; y < dibInfo.width; y++) {
-                int blue = file.get();
-                int green = file.get();
-                int red = file.get();
-                pixelRow.push_back(Pixel(red, green, blue));
-            }
-            file.seekg(dibInfo.width % 4, std::ios::cur);
-            pixels.insert(pixels.begin(), pixelRow);
-        }
-    } else {
-        std::cerr << "Error: Unsupported BMP format (only 1-bit, 8-bit grayscale, and 24-bit RGB are supported)" << std::endl;
-        exit(1);
-    }
+    //}
 
     file.close();
 }
@@ -145,16 +185,21 @@ void Bitmap::load(std::string filename) {
 // Write the BMP image to a file
 void Bitmap::write(std::string fileName) {
     std::ofstream file(fileName, std::ios::binary);
+    if (!file) {
+        std::cerr << "Error: Could not open file for writing." << std::endl;
+        return;
+    }
+
     file.write("BM", 2);
-    
+
     bmpFileHeader header = {0};
     header.bmpOffset = 2 + sizeof(bmpFileHeader) + sizeof(bmpFileDibInfo);
-    
-    if (isGrayscale) {
-        header.bmpOffset += 256 * 4;  // Grayscale palette (256 colors, 4 bytes each)
-        header.fileSize = header.bmpOffset + (pixels.size() * pixels[0].size() + pixels[0].size() % 4) * pixels.size();
+
+    if (dibInfo.bitsPerPixel == 8) {
+        header.bmpOffset += 256 * 4;  // Color palette (256 colors, 4 bytes each)
+        header.fileSize = header.bmpOffset + (dibInfo.width * dibInfo.height + dibInfo.width % 4) * dibInfo.height;
     } else {
-        header.fileSize = header.bmpOffset + (pixels.size() * 3 + pixels[0].size() % 4) * pixels.size();
+        header.fileSize = header.bmpOffset + (dibInfo.width * 3 + dibInfo.width % 4) * dibInfo.height;
     }
 
     file.write(reinterpret_cast<char*>(&header), sizeof(bmpFileHeader));
@@ -165,42 +210,43 @@ void Bitmap::write(std::string fileName) {
     dibInfo.height = pixels.size();
     dibInfo.planes = 1;
     
-    if (isGrayscale) {
+    if (dibInfo.bitsPerPixel == 8) {
         dibInfo.bitsPerPixel = 8;
         dibInfo.compression = 0;
         dibInfo.imageSize = dibInfo.width * dibInfo.height;
+        dibInfo.colorsUsed = 256;
     } else {
         dibInfo.bitsPerPixel = 24;
         dibInfo.imageSize = dibInfo.width * dibInfo.height * 3;
+        dibInfo.colorsUsed = 0;
     }
     dibInfo.xPixelsPerMeter = 2835;
     dibInfo.yPixelsPerMeter = 2835;
-    dibInfo.colorsUsed = isGrayscale ? 256 : 0;
     dibInfo.importantColors = 0;
 
     file.write(reinterpret_cast<char*>(&dibInfo), sizeof(bmpFileDibInfo));
 
-    // If grayscale, write the palette (256 grayscale colors)
-    if (isGrayscale) {
+    // If 8-bit, write the color palette
+    if (dibInfo.bitsPerPixel == 8) {
         for (int i = 0; i < 256; i++) {
-            file.put(i); // Blue
-            file.put(i); // Green
-            file.put(i); // Red
+            file.put(palette[i][0]); // Blue
+            file.put(palette[i][1]); // Green
+            file.put(palette[i][2]); // Red
             file.put(0); // Reserved
         }
     }
 
     // Write pixel data
-    for (int x = pixels.size() - 1; x >= 0; x--) {
+    for (int x = dibInfo.height - 1; x >= 0; x--) {
         const std::vector<Pixel> &rowPixels = pixels[x];
-        for (int y = 0; y < pixels[x].size(); y++) {
+        for (int y = 0; y < dibInfo.width; y++) {
             const Pixel &pixel = rowPixels[y];
-            if (isGrayscale) {
-                // Write grayscale pixel (map RGB to a single grayscale value)
-                uint8_t grayValue = static_cast<uint8_t>(0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue);
-                file.put(grayValue);
+            if (dibInfo.bitsPerPixel == 8) {
+                // Write 8-bit pixel index
+                uint8_t index = findClosestPaletteIndex(pixel);
+                file.put(index);
             } else {
-                // Write color pixel (RGB)
+                // Write 24-bit color pixel (BGR)
                 file.put((unsigned char)(pixel.blue));
                 file.put((unsigned char)(pixel.green));
                 file.put((unsigned char)(pixel.red));
@@ -208,12 +254,28 @@ void Bitmap::write(std::string fileName) {
         }
 
         // Write padding bytes
-        for (int i = 0; i < rowPixels.size() % 4; i++) {
+        for (int i = 0; i < dibInfo.width % 4; i++) {
             file.put(0);
         }
     }
 
     file.close();
+}
+
+// Helper function to find the closest palette index for a given pixel
+uint8_t Bitmap::findClosestPaletteIndex(const Pixel &pixel) {
+    uint8_t closestIndex = 0;
+    int closestDistance = INT_MAX;
+    for (int i = 0; i < 256; i++) {
+        int distance = (pixel.red - palette[i][2]) * (pixel.red - palette[i][2]) +
+                       (pixel.green - palette[i][1]) * (pixel.green - palette[i][1]) +
+                       (pixel.blue - palette[i][0]) * (pixel.blue - palette[i][0]);
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestIndex = i;
+        }
+    }
+    return closestIndex;
 }
 
 
@@ -267,7 +329,7 @@ void Bitmap::applyGaussianFilter(std::vector<std::vector<float> > kernel) {
 
             pixels[x][y].red = uint8_t(red);
             pixels[x][y].green = uint8_t(green);
-            pixels[x][y].green = uint8_t(green);
+            pixels[x][y].blue = uint8_t(blue);
         }
     }
 }

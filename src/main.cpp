@@ -18,6 +18,7 @@ int main(int argc, char* argv[]) {
 
     Bitmap image;
     image.load(inputImage); 
+    image.write(outputDir + "original_" + imageName);
 
     // Rotate the image clockwise and apply Gaussian filter
     {
