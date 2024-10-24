@@ -48,10 +48,6 @@ class Bitmap {
 
         std::vector<std::vector<Pixel>> pixels; // 2D vector storing the pixels of the image
 
-        bmpFileHeader header = {0};
-
-        bmpFileDibInfo dibInfo = {0};
-
         std::vector<std::vector<uint8_t>> palette;
 
     public:
@@ -77,7 +73,8 @@ class Bitmap {
         void rotate(bool clockwise);
 
         // Method to apply a Gaussian filter to the bitmap image
-        void applyGaussianFilter(std::vector<std::vector<float>> kernel);
+        void applyGaussianFilter(const std::vector<std::vector<float>>& kernel, int numThreads);
+        void applyGaussianFilterThread(const std::vector<std::vector<float>>& kernel, int startY, int endY);
 };
 
 // Function to generate a Gaussian kernel
@@ -88,6 +85,6 @@ std::string getImageName(std::string &imagePath);
 
 void printHelp();
 
-std::string *readArgs(int argc, char* argv[]);
+void readArgs(int argc, char* argv[], std::string& inputImage, std::string& outputDir, int& numThreads);
 
 #endif

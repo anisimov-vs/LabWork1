@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cmath>
 #include <unistd.h>
+#include <thread>
 
 // Function to generate a Gaussian kernel
 std::vector<std::vector<float> > generateGaussianKernel(int size, float sigma) {
@@ -50,12 +51,14 @@ std::string getImageName(std::string &imagePath) {
     return imageName;
 }
 
+
+
 // Load a BMP image from a file
-void Bitmap::load(std::string filename) {
-    std::ifstream file(filename, std::ios::binary);
+void Bitmap::load(std::string fileName) {
+    std::ifstream file(fileName, std::ios::binary);
 
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
+        std::cerr << "Error: Could not open file " << fileName << std::endl;
         exit(1);
     }
 
@@ -73,112 +76,103 @@ void Bitmap::load(std::string filename) {
     bmpFileDibInfo dibInfo;
     file.read(reinterpret_cast<char*>(&dibInfo), sizeof(bmpFileDibInfo));
 
-    // Check if the DIB header size indicates a V3 or later header
-    //if (dibInfo.headerSize >= 56) {
-        std::cout << dibInfo.headerSize << " " << dibInfo.bitsPerPixel << std::endl;
-        // Read the color masks if present
-        uint32_t redMask = 0x00FF0000;
-        uint32_t greenMask = 0x0000FF00;
-        uint32_t blueMask = 0x000000FF;
-        uint32_t alphaMask = 0xFF000000;
+    // Read the color masks if present
+    uint32_t redMask = 0x00FF0000;
+    uint32_t greenMask = 0x0000FF00;
+    uint32_t blueMask = 0x000000FF;
+    uint32_t alphaMask = 0xFF000000;
 
-        if (dibInfo.headerSize == 56 || dibInfo.headerSize == 108 || dibInfo.headerSize == 124) {
-            file.read(reinterpret_cast<char*>(&redMask), sizeof(redMask));
-            file.read(reinterpret_cast<char*>(&greenMask), sizeof(greenMask));
-            file.read(reinterpret_cast<char*>(&blueMask), sizeof(blueMask));
-            if (dibInfo.headerSize >= 108) {
-                file.read(reinterpret_cast<char*>(&alphaMask), sizeof(alphaMask));
-            }
+    if (dibInfo.headerSize == 56 || dibInfo.headerSize == 108 || dibInfo.headerSize == 124) {
+        file.read(reinterpret_cast<char*>(&redMask), sizeof(redMask));
+        file.read(reinterpret_cast<char*>(&greenMask), sizeof(greenMask));
+        file.read(reinterpret_cast<char*>(&blueMask), sizeof(blueMask));
+        if (dibInfo.headerSize >= 108) {
+            file.read(reinterpret_cast<char*>(&alphaMask), sizeof(alphaMask));
         }
+    }
 
-        // Seek to the pixel data start position
-        file.seekg(header.bmpOffset, std::ios::beg);
+    // Seek to the pixel data start position
+    file.seekg(header.bmpOffset, std::ios::beg);
 
-        // Handle 16-bit BMP with custom masks
-        if (dibInfo.bitsPerPixel == 16) {
-            isGrayscale = false;
-            for (int x = 0; x < dibInfo.height; x++) {
-                std::vector<Pixel> pixelRow;
-                for (int y = 0; y < dibInfo.width; y++) {
-                    uint16_t pixelValue = (file.get() | (file.get() << 8));
-                    uint8_t blue = ((pixelValue & blueMask) >> __builtin_ctz(blueMask)) * (255.0 / ((1 << __builtin_popcount(blueMask)) - 1));
-                    uint8_t green = ((pixelValue & greenMask) >> __builtin_ctz(greenMask)) * (255.0 / ((1 << __builtin_popcount(greenMask)) - 1));
-                    uint8_t red = ((pixelValue & redMask) >> __builtin_ctz(redMask)) * (255.0 / ((1 << __builtin_popcount(redMask)) - 1));
-                    pixelRow.push_back(Pixel(red, green, blue));
-                }
-                file.seekg(dibInfo.width % 4, std::ios::cur);
-                pixels.insert(pixels.begin(), pixelRow);
-            }
-        }
+    // If it's a 1-bit monochrome image
+    if (dibInfo.bitsPerPixel == 1) {
+        isGrayscale = true;
 
-    //} else {
-        // Seek to the pixel data start position
-        //file.seekg(header.bmpOffset, std::ios::beg);
+        // Read pixel data (each byte contains 8 pixels, packed as bits)
+        for (int x = 0; x < dibInfo.height; x++) {
+            std::vector<Pixel> pixelRow;
+            for (int y = 0; y < (dibInfo.width + 7) / 8; y++) {
+                uint8_t byte = file.get();  // Read one byte (8 pixels)
+                for (int bit = 0; bit < 8 && y * 8 + bit < dibInfo.width; bit++) {
 
-        // If it's a 1-bit monochrome image
-        else if (dibInfo.bitsPerPixel == 1) {
-            isGrayscale = true;
+                    uint8_t colorIndex = (byte >> (7 - bit)) & 0x01;
 
-            // Read pixel data (each byte contains 8 pixels, packed as bits)
-            for (int x = 0; x < dibInfo.height; x++) {
-                std::vector<Pixel> pixelRow;
-                for (int y = 0; y < (dibInfo.width + 7) / 8; y++) {
-                    uint8_t byte = file.get();  // Read one byte (8 pixels)
-                    for (int bit = 0; bit < 8 && y * 8 + bit < dibInfo.width; bit++) {
-
-                        uint8_t colorIndex = (byte >> (7 - bit)) & 0x01;
-
-                        Pixel pixel(0, 0, 0);
-                        if (colorIndex == 0) {
-                            pixel.blue = 255;
-                            pixel.green = 255;
-                            pixel.red = 255;
-                        }
-                        pixelRow.push_back(pixel);
+                    Pixel pixel(0, 0, 0);
+                    if (colorIndex == 0) {
+                        pixel.blue = 255;
+                        pixel.green = 255;
+                        pixel.red = 255;
                     }
-                }
-                // Handle padding bytes (each row must be a multiple of 4 bytes)
-                file.seekg((4 - ((dibInfo.width + 7) / 8) % 4) % 4, std::ios::cur);
-
-                pixels.insert(pixels.begin(), pixelRow);
-            }
-        } 
-        // Handle 8-bit grayscale
-        else if (dibInfo.bitsPerPixel == 8) {
-            isGrayscale = true;
-            std::vector<std::vector<uint8_t>> palette(256, std::vector<uint8_t>(4));
-
-            for (int x = 0; x < dibInfo.height; x++) {
-                std::vector<Pixel> pixelRow;
-                for (int y = 0; y < dibInfo.width; y++) {
-                    uint8_t grayValue = file.get();
-                    Pixel pixel(grayValue, grayValue, grayValue);
                     pixelRow.push_back(pixel);
                 }
-                file.seekg(dibInfo.width % 4, std::ios::cur);
-                pixels.insert(pixels.begin(), pixelRow);
             }
-        }
-        // Handle 24-bit RGB
-        else if (dibInfo.bitsPerPixel == 24) {
-            isGrayscale = false;
-            for (int x = 0; x < dibInfo.height; x++) {
-                std::vector<Pixel> pixelRow;
-                for (int y = 0; y < dibInfo.width; y++) {
-                    int blue = file.get();
-                    int green = file.get();
-                    int red = file.get();
-                    pixelRow.push_back(Pixel(red, green, blue));
-                }
-                file.seekg(dibInfo.width % 4, std::ios::cur);
-                pixels.insert(pixels.begin(), pixelRow);
-            }
-        } else {
-            std::cerr << "Error: Unsupported BMP format (only 1-bit, 8-bit grayscale, 16-bit, and 24-bit RGB are supported)" << std::endl;
-            exit(1);
-        }
-    //}
+            // Handle padding bytes (each row must be a multiple of 4 bytes)
+            file.seekg((4 - ((dibInfo.width + 7) / 8) % 4) % 4, std::ios::cur);
 
+            pixels.insert(pixels.begin(), pixelRow);
+        }
+    } 
+    // Handle 8-bit grayscale
+    else if (dibInfo.bitsPerPixel == 8) {
+        isGrayscale = true;
+        std::vector<std::vector<uint8_t>> palette(256, std::vector<uint8_t>(4));
+
+        for (int x = 0; x < dibInfo.height; x++) {
+            std::vector<Pixel> pixelRow;
+            for (int y = 0; y < dibInfo.width; y++) {
+                uint8_t grayValue = file.get();
+                Pixel pixel(grayValue, grayValue, grayValue);
+                pixelRow.push_back(pixel);
+            }
+            file.seekg(dibInfo.width % 4, std::ios::cur);
+            pixels.insert(pixels.begin(), pixelRow);
+        }
+    }
+    // Handle 16-bit BMP with custom masks
+    else if (dibInfo.bitsPerPixel == 16) {
+        isGrayscale = false;
+        for (int x = 0; x < dibInfo.height; x++) {
+            std::vector<Pixel> pixelRow;
+            for (int y = 0; y < dibInfo.width; y++) {
+                uint16_t pixelValue = (file.get() | (file.get() << 8));
+                uint8_t blue = ((pixelValue & blueMask) >> __builtin_ctz(blueMask)) * (255.0 / ((1 << __builtin_popcount(blueMask)) - 1));
+                uint8_t green = ((pixelValue & greenMask) >> __builtin_ctz(greenMask)) * (255.0 / ((1 << __builtin_popcount(greenMask)) - 1));
+                uint8_t red = ((pixelValue & redMask) >> __builtin_ctz(redMask)) * (255.0 / ((1 << __builtin_popcount(redMask)) - 1));
+                pixelRow.push_back(Pixel(red, green, blue));
+            }
+            file.seekg(dibInfo.width % 4, std::ios::cur);
+            pixels.insert(pixels.begin(), pixelRow);
+        }
+    }
+    // Handle 24-bit RGB
+    else if (dibInfo.bitsPerPixel == 24) {
+        isGrayscale = false;
+        for (int x = 0; x < dibInfo.height; x++) {
+            std::vector<Pixel> pixelRow;
+            for (int y = 0; y < dibInfo.width; y++) {
+                int blue = file.get();
+                int green = file.get();
+                int red = file.get();
+                pixelRow.push_back(Pixel(red, green, blue));
+            }
+            file.seekg(dibInfo.width % 4, std::ios::cur);
+            pixels.insert(pixels.begin(), pixelRow);
+        }
+    } else {
+        std::cerr << "Error: Unsupported BMP format (only 1-bit, 8-bit grayscale, 16-bit, and 24-bit RGB are supported), you image is " << dibInfo.bitsPerPixel << " bits per pixel" << std::endl;
+        exit(1);
+    }
+    std::cout << "Loaded " << getImageName(fileName) << " with " << dibInfo.width << "x" << dibInfo.height << " pixels and " << dibInfo.bitsPerPixel << " bits per pixel" << std::endl;
     file.close();
 }
 
@@ -194,15 +188,6 @@ void Bitmap::write(std::string fileName) {
 
     bmpFileHeader header = {0};
     header.bmpOffset = 2 + sizeof(bmpFileHeader) + sizeof(bmpFileDibInfo);
-
-    if (dibInfo.bitsPerPixel == 8) {
-        header.bmpOffset += 256 * 4;  // Color palette (256 colors, 4 bytes each)
-        header.fileSize = header.bmpOffset + (dibInfo.width * dibInfo.height + dibInfo.width % 4) * dibInfo.height;
-    } else {
-        header.fileSize = header.bmpOffset + (dibInfo.width * 3 + dibInfo.width % 4) * dibInfo.height;
-    }
-
-    file.write(reinterpret_cast<char*>(&header), sizeof(bmpFileHeader));
 
     bmpFileDibInfo dibInfo = {0};
     dibInfo.headerSize = sizeof(bmpFileDibInfo);
@@ -224,6 +209,14 @@ void Bitmap::write(std::string fileName) {
     dibInfo.yPixelsPerMeter = 2835;
     dibInfo.importantColors = 0;
 
+    if (dibInfo.bitsPerPixel == 8) {
+        header.bmpOffset += 256 * 4;  // Color palette (256 colors, 4 bytes each)
+        header.fileSize = header.bmpOffset + (dibInfo.width * dibInfo.height + dibInfo.width % 4) * dibInfo.height;
+    } else {
+        header.fileSize = header.bmpOffset + (dibInfo.width * 3 + dibInfo.width % 4) * dibInfo.height;
+    }
+
+    file.write(reinterpret_cast<char*>(&header), sizeof(bmpFileHeader));
     file.write(reinterpret_cast<char*>(&dibInfo), sizeof(bmpFileDibInfo));
 
     // If 8-bit, write the color palette
@@ -235,6 +228,7 @@ void Bitmap::write(std::string fileName) {
             file.put(0); // Reserved
         }
     }
+    
 
     // Write pixel data
     for (int x = dibInfo.height - 1; x >= 0; x--) {
@@ -299,15 +293,36 @@ void Bitmap::rotate(bool clockwise) {
     pixels = rotatedPixels;
 }
 
-// Apply a Gaussian filter to the image
-void Bitmap::applyGaussianFilter(std::vector<std::vector<float> > kernel) {
-    int32_t width = pixels.size();
-    int32_t heigth = pixels[0].size();
 
+void Bitmap::applyGaussianFilter(const std::vector<std::vector<float>>& kernel, int numThreads) {
+    int32_t width = pixels.size();
+    int32_t height = pixels[0].size();
+
+    if (numThreads <= 0) {
+        numThreads = std::thread::hardware_concurrency();
+    }
+
+    int stripHeight = height / numThreads;
+    std::vector<std::thread> threads;
+
+    for (int i = 0; i < numThreads; ++i) {
+        int startY = i * stripHeight;
+        int endY = (i == numThreads - 1) ? height : (i + 1) * stripHeight;
+        threads.emplace_back(&Bitmap::applyGaussianFilterThread, this, std::ref(kernel), startY, endY);
+    }
+
+    for (auto& thread : threads) {
+        thread.join();
+    }
+}
+
+void Bitmap::applyGaussianFilterThread(const std::vector<std::vector<float>>& kernel, int startY, int endY) {
+    int32_t width = pixels.size();
+    int32_t height = pixels[0].size();
     int halfKernelSize = kernel.size() / 2;
 
     for (int x = 0; x < width; x++) {
-        for (int y = 0; y < heigth; y++) {
+        for (int y = startY; y < endY; y++) {
             float red = 0.0, green = 0.0, blue = 0.0;
 
             // Convolve the kernel with the image
@@ -319,7 +334,7 @@ void Bitmap::applyGaussianFilter(std::vector<std::vector<float> > kernel) {
                     if (nx < 0) nx = 0;
                     if (nx >= width) nx = width - 1;
                     if (ny < 0) ny = 0;
-                    if (ny >= heigth) ny = heigth -1;
+                    if (ny >= height) ny = height - 1;
 
                     red += pixels[nx][ny].red * kernel[i + halfKernelSize][j + halfKernelSize];
                     green += pixels[nx][ny].green * kernel[i + halfKernelSize][j + halfKernelSize];
@@ -336,39 +351,82 @@ void Bitmap::applyGaussianFilter(std::vector<std::vector<float> > kernel) {
 
 // Function to print help message
 void printHelp() {
-    std::cout << "Usage: main [options] [input_image] [output_dir]" << std::endl;
+    std::cout << "Usage: main [options] [input_image] [output_dir] [num_threads]" << std::endl;
     std::cout << "Options:" << std::endl;
-    std::cout << "  -i <input_image>    Specify the input image file (default: image.bmp)" << std::endl;
-    std::cout << "  -o <output_dir>     Specify the output directory (default: output/)" << std::endl;
-    std::cout << "  -h                  Display this help message" << std::endl;
-    std::cout << "If input_image and output_dir are not provided, default values are used." << std::endl;
-    std::cout << "Default input_image: image.bmp" << std::endl;
-    std::cout << "Default output_dir: output/" << std::endl;
+    std::cout << "  -i <input_image>     Specify the input image file  (default: image.bmp)" << std::endl;
+    std::cout << "  -o <output_dir>      Specify the output directory  (default: output/)" << std::endl;
+    std::cout << "  -n <num_threads>     Specify the number of threads (default: best possible)" << std::endl;
+    std::cout << "  -h                   Display this help message" << std::endl;
+    std::cout << "If input_image, output_dir or num_threads are not provided, default values are used." << std::endl;
 }
 
-std::string *readArgs(int argc, char* argv[]) {
-    std::string inputImage = "image.bmp";
-    std::string outputDir = "output/";
-
+void readArgs(int argc, char* argv[], std::string& inputImage, std::string& outputDir, int& numThreads) {
+    numThreads = std::thread::hardware_concurrency();
     int opt;
     // Parse command-line options
-    while ((opt = getopt(argc, argv, "i:o:h")) != -1) {
+    while ((opt = getopt(argc, argv, "i:o:n:h")) != -1) {
         switch (opt) {
             case 'i':
-                inputImage = optarg;  // Set input image file from command-line argument
+                if ((optarg) && (optarg[0] != '-')) {
+                    try {
+                        inputImage = optarg; // Set number of threads from command-line argument
+                    } catch (const std::invalid_argument& e) {
+                        std::cerr << "Error: Invalid argument for -i option." << std::endl;
+                        printHelp();
+                        exit(1);
+                    }
+                } else {
+                    std::cerr << "Error: -i option requires an argument." << std::endl;
+                    printHelp();
+                    exit(1);
+                }
+
                 break;
             case 'o':
-                outputDir = optarg;   // Set output directory from command-line argument
+                if ((optarg) && (optarg[0] != '-')) {
+                    try {
+                        outputDir = optarg; // Set number of threads from command-line argument
+                    } catch (const std::invalid_argument& e) {
+                        std::cerr << "Error: Invalid argument for -o option." << std::endl;
+                        printHelp();
+                        exit(1);
+                    }
+                } else {
+                    std::cerr << "Error: -o option requires an argument." << std::endl;
+                    printHelp();
+                    exit(1);
+                }
+
                 break;
             case 'h':
                 printHelp();          // Display help message and exit
-                return nullptr;
+                exit(0);
+            case 'n':
+                if (optarg) {
+                    try {
+                        numThreads = std::stoi(optarg); // Set number of threads from command-line argument
+                    } catch (const std::invalid_argument& e) {
+                        std::cerr << "Error: Invalid argument for -n option." << std::endl;
+                        printHelp();
+                        return;
+                    } catch (const std::out_of_range& e) {
+                        std::cerr << "Error: Argument for -n option is out of range." << std::endl;
+                        printHelp();
+                        return;
+                    }
+                } else {
+                    std::cerr << "Error: -n option requires an argument." << std::endl;
+                    printHelp();
+                    exit(1);
+                }
+                break;
             default:
                 printHelp();          // Display help message and exit with error
-                return nullptr;
+                return;
         }
     }
 
+    std::cout << "Number of threads set to " << numThreads << std::endl;
     // Check for positional arguments (input image and output directory)
     if (optind < argc) {
         inputImage = argv[optind++];  // Set input image file from positional argument
@@ -381,11 +439,4 @@ std::string *readArgs(int argc, char* argv[]) {
     if (outputDir.back() != '/') {
         outputDir += '/';
     }
-
-    // Allocate a dynamic array of two strings to store the results
-    std::string *result = new std::string[2];
-    result[0] = inputImage;
-    result[1] = outputDir;
-
-    return result;  // Return the pointer to the array
 }
