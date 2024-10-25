@@ -79,7 +79,7 @@ void Bitmap::load(std::string fileName) {
     // Read palette if 8-bit
     if (dibInfo.bitsPerPixel == 8) {
         palette.resize(256, std::vector<uint8_t>(3));
-        
+
         for (int i = 0; i < 256; i++) {
             file.read(reinterpret_cast<char*>(palette[i].data()), 3);
             file.ignore(1);
@@ -299,7 +299,6 @@ void Bitmap::rotate(bool clockwise) {
 
 
 void Bitmap::applyGaussianFilter(const std::vector<std::vector<float>>& kernel, int numThreads) {
-    int32_t width = pixels.size();
     int32_t height = pixels[0].size();
 
     if (numThreads <= 0) {

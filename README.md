@@ -34,12 +34,11 @@ make
 ### Usage
 
 ```
-Usage: main [options] [input_image] [output_dir]
+Usage: main [options] [input_image] [output_dir] [num_threads]
 Options:
-  -i <input_image>    Specify the input image file (default: image.bmp)
-  -o <output_dir>     Specify the output directory (default: output/)
-  -h                  Display this help message
-If input_image and output_dir are not provided, default values are used.
-Default input_image: image.bmp
-Default output_dir: output/
+  -i <input_image>     Specify the input image file  (default: image.bmp)
+  -o <output_dir>      Specify the output directory  (default: output/)
+  -n <num_threads>     Specify the number of threads (default: best possible)
+  -h                   Display this help message
+If input_image, output_dir or num_threads are not provided, default values are used
 ```
