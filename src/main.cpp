@@ -18,12 +18,14 @@ int main(int argc, char* argv[]) {
     std::string imageName = getImageName(inputImage);
 
     Bitmap image;
-    image.load(inputImage); 
+    image.load(inputImage);
 
     // Rotate the image clockwise
     {
         Bitmap clockwise_image(image);  // Create a copy of the original image
+
         clockwise_image.rotate(true);   // Rotate the image clockwise
+
         clockwise_image.write(outputDir + "rotatedClockwise_" + imageName);  // Save the rotated image
     }
 
@@ -32,20 +34,24 @@ int main(int argc, char* argv[]) {
     // Rotate the image counter-clockwise
     {
         Bitmap counterClockwise_image(image);  // Create a copy of the original image
+
         counterClockwise_image.rotate(false);  // Rotate the image counter-clockwise
+
         counterClockwise_image.write(outputDir + "rotatedCounterClockwise_" + imageName);  // Save the rotated image
     }
 
     std::cout << imageName << " rotated counter-clockwise and saved to " << outputDir + "rotatedCounterClockwise_" + imageName << std::endl;
 
-    image.applyGaussianFilter(kernel, 0);  // Apply Gaussian filter to the original image
+    image.applyGaussianFilter(kernel, numThreads);  // Apply Gaussian filter to the original image
 
     std::cout << imageName << " Gaussian filtered" << std::endl;
 
     // Rotate the filtered image clockwise
     {
         Bitmap clockwise_image(image);
+
         clockwise_image.rotate(true);   // Rotate the image clockwise
+
         clockwise_image.write(outputDir + "filteredRotatedClockwise_" + imageName);  // Save the rotated image
     }
 
@@ -54,7 +60,9 @@ int main(int argc, char* argv[]) {
     // Rotate the filtered image counter-clockwise
     {
         Bitmap counterClockwise_image(image);  // Create a copy of the original image
+
         counterClockwise_image.rotate(false);  // Rotate the image counter-clockwise
+
         counterClockwise_image.write(outputDir + "filteredRotatedCounterClockwise_" + imageName);  // Save the rotated image
     }
 

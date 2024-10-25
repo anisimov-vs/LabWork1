@@ -38,6 +38,7 @@ std::vector<std::vector<float> > generateGaussianKernel(int size, float sigma) {
     return kernel;
 }
 
+
 // Extract the image name from a full path
 std::string getImageName(std::string &imagePath) {
     std::string token;
@@ -47,11 +48,9 @@ std::string getImageName(std::string &imagePath) {
     while (std::getline(tokenStream, token, '/')) {
         imageName = token;
     }
-    
+
     return imageName;
 }
-
-
 
 // Load a BMP image from a file
 void Bitmap::load(std::string fileName) {
@@ -64,8 +63,8 @@ void Bitmap::load(std::string fileName) {
 
     unsigned char fileType[2];
     file.read(reinterpret_cast<char*>(fileType), 2);
-    
-    if ((fileType[0] != 'B') && (fileType[1] != 'M')) {
+
+    if ((fileType[0] != 'B') || (fileType[1] != 'M')) {
         std::cerr << "Error: File is not a BMP file" << std::endl;
         exit(1);
     }
@@ -76,43 +75,43 @@ void Bitmap::load(std::string fileName) {
     bmpFileDibInfo dibInfo;
     file.read(reinterpret_cast<char*>(&dibInfo), sizeof(bmpFileDibInfo));
 
-    // Read the color masks if present
-    uint32_t redMask = 0x00FF0000;
-    uint32_t greenMask = 0x0000FF00;
-    uint32_t blueMask = 0x000000FF;
-    uint32_t alphaMask = 0xFF000000;
+    isGrayscale = true;
+    // Read palette if 8-bit
+    if (dibInfo.bitsPerPixel == 8) {
+        palette.resize(256, std::vector<uint8_t>(3));
+        
+        for (int i = 0; i < 256; i++) {
+            file.read(reinterpret_cast<char*>(palette[i].data()), 3);
+            file.ignore(1);
 
-    if (dibInfo.headerSize == 56 || dibInfo.headerSize == 108 || dibInfo.headerSize == 124) {
-        file.read(reinterpret_cast<char*>(&redMask), sizeof(redMask));
-        file.read(reinterpret_cast<char*>(&greenMask), sizeof(greenMask));
-        file.read(reinterpret_cast<char*>(&blueMask), sizeof(blueMask));
-        if (dibInfo.headerSize >= 108) {
-            file.read(reinterpret_cast<char*>(&alphaMask), sizeof(alphaMask));
+            if (palette[i][0] != palette[i][1] || palette[i][1] != palette[i][2] || palette[i][0] != palette[i][2]) {
+                isGrayscale = false;
+            }
         }
     }
 
-    // Seek to the pixel data start position
     file.seekg(header.bmpOffset, std::ios::beg);
 
     // If it's a 1-bit monochrome image
     if (dibInfo.bitsPerPixel == 1) {
         isGrayscale = true;
-
         // Read pixel data (each byte contains 8 pixels, packed as bits)
         for (int x = 0; x < dibInfo.height; x++) {
             std::vector<Pixel> pixelRow;
             for (int y = 0; y < (dibInfo.width + 7) / 8; y++) {
                 uint8_t byte = file.get();  // Read one byte (8 pixels)
-                for (int bit = 0; bit < 8 && y * 8 + bit < dibInfo.width; bit++) {
 
+                for (int bit = 0; bit < 8 && y * 8 + bit < dibInfo.width; bit++) {
                     uint8_t colorIndex = (byte >> (7 - bit)) & 0x01;
 
                     Pixel pixel(0, 0, 0);
+
                     if (colorIndex == 0) {
                         pixel.blue = 255;
                         pixel.green = 255;
                         pixel.red = 255;
                     }
+
                     pixelRow.push_back(pixel);
                 }
             }
@@ -121,51 +120,70 @@ void Bitmap::load(std::string fileName) {
 
             pixels.insert(pixels.begin(), pixelRow);
         }
-    } 
+    }
     // Handle 8-bit grayscale
     else if (dibInfo.bitsPerPixel == 8) {
-        isGrayscale = true;
-        std::vector<std::vector<uint8_t>> palette(256, std::vector<uint8_t>(4));
 
         for (int x = 0; x < dibInfo.height; x++) {
             std::vector<Pixel> pixelRow;
+
             for (int y = 0; y < dibInfo.width; y++) {
-                uint8_t grayValue = file.get();
-                Pixel pixel(grayValue, grayValue, grayValue);
+                uint8_t index = file.get();
+
+                uint8_t red = palette[index][2];
+                uint8_t green = palette[index][1];
+                uint8_t blue = palette[index][0];
+
+                Pixel pixel(red, green, blue);
+
                 pixelRow.push_back(pixel);
             }
+
             file.seekg(dibInfo.width % 4, std::ios::cur);
+
             pixels.insert(pixels.begin(), pixelRow);
         }
     }
     // Handle 16-bit BMP with custom masks
     else if (dibInfo.bitsPerPixel == 16) {
         isGrayscale = false;
+
         for (int x = 0; x < dibInfo.height; x++) {
             std::vector<Pixel> pixelRow;
+
             for (int y = 0; y < dibInfo.width; y++) {
                 uint16_t pixelValue = (file.get() | (file.get() << 8));
-                uint8_t blue = ((pixelValue & blueMask) >> __builtin_ctz(blueMask)) * (255.0 / ((1 << __builtin_popcount(blueMask)) - 1));
-                uint8_t green = ((pixelValue & greenMask) >> __builtin_ctz(greenMask)) * (255.0 / ((1 << __builtin_popcount(greenMask)) - 1));
-                uint8_t red = ((pixelValue & redMask) >> __builtin_ctz(redMask)) * (255.0 / ((1 << __builtin_popcount(redMask)) - 1));
+
+                uint8_t blue = (pixelValue & 0x001F) * (255.0 / 31);
+                uint8_t green = ((pixelValue & 0x07E0) >> 5) * (255.0 / 63); // Scale 6-bit to 8-bit
+                uint8_t red = ((pixelValue & 0xF800) >> 11) * (255.0 / 31); // Scale 5-bit to 8-bit
+
                 pixelRow.push_back(Pixel(red, green, blue));
             }
+
             file.seekg(dibInfo.width % 4, std::ios::cur);
+
             pixels.insert(pixels.begin(), pixelRow);
         }
     }
     // Handle 24-bit RGB
     else if (dibInfo.bitsPerPixel == 24) {
+        file.seekg(header.bmpOffset, std::ios::beg);
         isGrayscale = false;
+
         for (int x = 0; x < dibInfo.height; x++) {
             std::vector<Pixel> pixelRow;
+
             for (int y = 0; y < dibInfo.width; y++) {
                 int blue = file.get();
                 int green = file.get();
                 int red = file.get();
+
                 pixelRow.push_back(Pixel(red, green, blue));
             }
+
             file.seekg(dibInfo.width % 4, std::ios::cur);
+
             pixels.insert(pixels.begin(), pixelRow);
         }
     } else {
@@ -173,12 +191,14 @@ void Bitmap::load(std::string fileName) {
         exit(1);
     }
     std::cout << "Loaded " << getImageName(fileName) << " with " << dibInfo.width << "x" << dibInfo.height << " pixels and " << dibInfo.bitsPerPixel << " bits per pixel" << std::endl;
+
     file.close();
 }
 
 // Write the BMP image to a file
 void Bitmap::write(std::string fileName) {
     std::ofstream file(fileName, std::ios::binary);
+
     if (!file) {
         std::cerr << "Error: Could not open file for writing." << std::endl;
         return;
@@ -194,8 +214,8 @@ void Bitmap::write(std::string fileName) {
     dibInfo.width = pixels[0].size();
     dibInfo.height = pixels.size();
     dibInfo.planes = 1;
-    
-    if (dibInfo.bitsPerPixel == 8) {
+
+    if (isGrayscale) {
         dibInfo.bitsPerPixel = 8;
         dibInfo.compression = 0;
         dibInfo.imageSize = dibInfo.width * dibInfo.height;
@@ -205,8 +225,9 @@ void Bitmap::write(std::string fileName) {
         dibInfo.imageSize = dibInfo.width * dibInfo.height * 3;
         dibInfo.colorsUsed = 0;
     }
-    dibInfo.xPixelsPerMeter = 2835;
-    dibInfo.yPixelsPerMeter = 2835;
+
+    dibInfo.xPixelsPerMeter = 2834;
+    dibInfo.yPixelsPerMeter = 2834;
     dibInfo.importantColors = 0;
 
     if (dibInfo.bitsPerPixel == 8) {
@@ -220,30 +241,30 @@ void Bitmap::write(std::string fileName) {
     file.write(reinterpret_cast<char*>(&dibInfo), sizeof(bmpFileDibInfo));
 
     // If 8-bit, write the color palette
-    if (dibInfo.bitsPerPixel == 8) {
+    if (dibInfo.bitsPerPixel == 8) { 
         for (int i = 0; i < 256; i++) {
             file.put(palette[i][0]); // Blue
             file.put(palette[i][1]); // Green
             file.put(palette[i][2]); // Red
-            file.put(0); // Reserved
+            file.put(0);
         }
     }
-    
 
     // Write pixel data
+    //for (int x = dibInfo.height - 1; x >= 0; x--) {
     for (int x = dibInfo.height - 1; x >= 0; x--) {
         const std::vector<Pixel> &rowPixels = pixels[x];
         for (int y = 0; y < dibInfo.width; y++) {
             const Pixel &pixel = rowPixels[y];
+
             if (dibInfo.bitsPerPixel == 8) {
-                // Write 8-bit pixel index
-                uint8_t index = findClosestPaletteIndex(pixel);
-                file.put(index);
+                // Write 8-bit pixel
+                file.put(pixel.blue);
             } else {
-                // Write 24-bit color pixel (BGR)
-                file.put((unsigned char)(pixel.blue));
-                file.put((unsigned char)(pixel.green));
-                file.put((unsigned char)(pixel.red));
+                // Write 24-bit pixel
+                file.put(pixel.blue);
+                file.put(pixel.green);
+                file.put(pixel.red);
             }
         }
 
@@ -255,23 +276,6 @@ void Bitmap::write(std::string fileName) {
 
     file.close();
 }
-
-// Helper function to find the closest palette index for a given pixel
-uint8_t Bitmap::findClosestPaletteIndex(const Pixel &pixel) {
-    uint8_t closestIndex = 0;
-    int closestDistance = INT_MAX;
-    for (int i = 0; i < 256; i++) {
-        int distance = (pixel.red - palette[i][2]) * (pixel.red - palette[i][2]) +
-                       (pixel.green - palette[i][1]) * (pixel.green - palette[i][1]) +
-                       (pixel.blue - palette[i][0]) * (pixel.blue - palette[i][0]);
-        if (distance < closestDistance) {
-            closestDistance = distance;
-            closestIndex = i;
-        }
-    }
-    return closestIndex;
-}
-
 
 // Rotate the image 90 degrees clockwise or counterclockwise
 void Bitmap::rotate(bool clockwise) {
@@ -289,7 +293,7 @@ void Bitmap::rotate(bool clockwise) {
             }
         }
     }
-    
+
     pixels = rotatedPixels;
 }
 
@@ -363,66 +367,71 @@ void printHelp() {
 void readArgs(int argc, char* argv[], std::string& inputImage, std::string& outputDir, int& numThreads) {
     numThreads = std::thread::hardware_concurrency();
     int opt;
-    // Parse command-line options
+
     while ((opt = getopt(argc, argv, "i:o:n:h")) != -1) {
         switch (opt) {
-            case 'i':
-                if ((optarg) && (optarg[0] != '-')) {
-                    try {
-                        inputImage = optarg; // Set number of threads from command-line argument
-                    } catch (const std::invalid_argument& e) {
-                        std::cerr << "Error: Invalid argument for -i option." << std::endl;
-                        printHelp();
-                        exit(1);
-                    }
-                } else {
-                    std::cerr << "Error: -i option requires an argument." << std::endl;
+        case 'i':
+            if ((optarg) && (optarg[0] != '-')) {
+                try {
+                    inputImage = optarg; // Set number of threads from command-line argument
+                } catch (const std::invalid_argument& e) {
+                    std::cerr << "Error: Invalid argument for -i option." << std::endl;
                     printHelp();
                     exit(1);
                 }
+            } else {
+                std::cerr << "Error: -i option requires an argument." << std::endl;
+                printHelp();
+                exit(1);
+            }
 
-                break;
-            case 'o':
-                if ((optarg) && (optarg[0] != '-')) {
-                    try {
-                        outputDir = optarg; // Set number of threads from command-line argument
-                    } catch (const std::invalid_argument& e) {
-                        std::cerr << "Error: Invalid argument for -o option." << std::endl;
-                        printHelp();
-                        exit(1);
-                    }
-                } else {
-                    std::cerr << "Error: -o option requires an argument." << std::endl;
-                    printHelp();
-                    exit(1);
-                }
+            break;
 
-                break;
-            case 'h':
-                printHelp();          // Display help message and exit
-                exit(0);
-            case 'n':
-                if (optarg) {
-                    try {
-                        numThreads = std::stoi(optarg); // Set number of threads from command-line argument
-                    } catch (const std::invalid_argument& e) {
-                        std::cerr << "Error: Invalid argument for -n option." << std::endl;
-                        printHelp();
-                        return;
-                    } catch (const std::out_of_range& e) {
-                        std::cerr << "Error: Argument for -n option is out of range." << std::endl;
-                        printHelp();
-                        return;
-                    }
-                } else {
-                    std::cerr << "Error: -n option requires an argument." << std::endl;
+        case 'o':
+            if ((optarg) && (optarg[0] != '-')) {
+                try {
+                    outputDir = optarg; // Set number of threads from command-line argument
+                } catch (const std::invalid_argument& e) {
+                    std::cerr << "Error: Invalid argument for -o option." << std::endl;
                     printHelp();
                     exit(1);
                 }
-                break;
-            default:
-                printHelp();          // Display help message and exit with error
-                return;
+            } else {
+                std::cerr << "Error: -o option requires an argument." << std::endl;
+                printHelp();
+                exit(1);
+            }
+
+            break;
+
+        case 'h':
+            printHelp();          // Display help message and exit
+            exit(0);
+
+        case 'n':
+            if (optarg) {
+                try {
+                    numThreads = std::stoi(optarg); // Set number of threads from command-line argument
+                } catch (const std::invalid_argument& e) {
+                    std::cerr << "Error: Invalid argument for -n option." << std::endl;
+                    printHelp();
+                    return;
+                } catch (const std::out_of_range& e) {
+                    std::cerr << "Error: Argument for -n option is out of range." << std::endl;
+                    printHelp();
+                    return;
+                }
+            } else {
+                std::cerr << "Error: -n option requires an argument." << std::endl;
+                printHelp();
+                exit(1);
+            }
+
+            break;
+        default:
+            printHelp();          // Display help message and exit with error
+
+            return;
         }
     }
 

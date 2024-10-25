@@ -33,48 +33,51 @@ struct bmpFileDibInfo {
 
 // Class representing a single pixel with RGB values
 class Pixel {
-    public:
-        uint8_t red, green, blue; // Red, Green, and Blue color components of the pixel
+  public:
+    uint8_t red, green, blue; // Red, Green, and Blue color components of the pixel
 
-        Pixel() : red(0), green(0), blue(0) { } // Default constructor initializing pixel to black
+    Pixel() : red(0), green(0), blue(0) { } // Default constructor initializing pixel to black
 
-        Pixel(float r, float g, float b) : red(r), green(g), blue(b) { } // Constructor to initialize pixel with specific values
+    Pixel(float r, float g, float b) : red(r), green(g), blue(b) { } // Constructor to initialize pixel with specific values
 };
 
 // Class representing a Bitmap image
 class Bitmap {
-    private:
-        bool isGrayscale;
+  private:
+    bool isGrayscale;
 
-        std::vector<std::vector<Pixel>> pixels; // 2D vector storing the pixels of the image
+    std::vector<std::vector<Pixel>> pixels; // 2D vector storing the pixels of the image
 
-        std::vector<std::vector<uint8_t>> palette;
+    std::vector<std::vector<uint8_t>> palette;
 
-    public:
-        Bitmap() { } // Default constructor
+  public:
+    Bitmap() { } // Default constructor
 
-        // Copy constructor
-        Bitmap(const Bitmap& other) : pixels(other.pixels), isGrayscale(other.isGrayscale) { }
+    // Copy constructor
+    Bitmap(const Bitmap& other) : pixels(other.pixels), isGrayscale(other.isGrayscale), palette(other.palette) { }
 
-        // Constructor initializing a bitmap with given width and height
-        Bitmap(int32_t width, int32_t height) : pixels(width, std::vector<Pixel>(height)) { }
+    // Constructor initializing a bitmap with given width and height
+    Bitmap(int32_t width, int32_t height) : pixels(width, std::vector<Pixel>(height)) { }
 
-        ~Bitmap() { pixels.clear(); } // Destructor clearing the pixel data
+    ~Bitmap() {
+        palette.clear();   // Destructor clearing the palette data
+        pixels.clear();    // Destructor clearing the pixel data
+    }
 
-        // Method to load a bitmap from a file
-        void load(std::string);
+    // Method to load a bitmap from a file
+    void load(std::string);
 
-        uint8_t findClosestPaletteIndex(const Pixel &pixel);
+    uint8_t findClosestPaletteIndex(const Pixel &pixel);
 
-        // Method to write a bitmap to a file
-        void write(std::string);
+    // Method to write a bitmap to a file
+    void write(std::string);
 
-        // Method to rotate the bitmap image
-        void rotate(bool clockwise);
+    // Method to rotate the bitmap image
+    void rotate(bool clockwise);
 
-        // Method to apply a Gaussian filter to the bitmap image
-        void applyGaussianFilter(const std::vector<std::vector<float>>& kernel, int numThreads);
-        void applyGaussianFilterThread(const std::vector<std::vector<float>>& kernel, int startY, int endY);
+    // Method to apply a Gaussian filter to the bitmap image
+    void applyGaussianFilter(const std::vector<std::vector<float>>& kernel, int numThreads);
+    void applyGaussianFilterThread(const std::vector<std::vector<float>>& kernel, int startY, int endY);
 };
 
 // Function to generate a Gaussian kernel
