@@ -5,68 +5,24 @@
 #include <iostream>
 
 int main(int argc, char* argv[]) {
-    int kernelSize = 5;  // Set the size of the Gaussian kernel
-    float sigma = 1.0;   // Set the standard deviation for the Gaussian kernel
-    std::vector<std::vector<float>> kernel = generateGaussianKernel(kernelSize, sigma);  // Generate the Gaussian kernel
+    Arguments args = readArgs(argc, argv);
 
-    std::string inputImage = "image.bmp";
-    std::string outputDir = "output/";
-    int numThreads;
+    std::vector<std::vector<float>> kernel = generateGaussianKernel(args.kernelSize, args.sigma);  // Generate the Gaussian kernel
 
-    readArgs(argc, argv, inputImage, outputDir, numThreads);
+    std::string imageName = getImageName(args.inputImage);
 
-    std::string imageName = getImageName(inputImage);
+    Bitmap image(args.inputImage);
 
-    Bitmap image;
-    image.load(inputImage);
-
-    // Rotate the image clockwise
-    {
-        Bitmap clockwise_image(image);  // Create a copy of the original image
-
-        clockwise_image.rotate(true);   // Rotate the image clockwise
-
-        clockwise_image.write(outputDir + "rotatedClockwise_" + imageName);  // Save the rotated image
-    }
-
-    std::cout << imageName << " rotated clockwise and saved to " << outputDir + "rotatedClockwise_" + imageName << std::endl;
-
-    // Rotate the image counter-clockwise
-    {
-        Bitmap counterClockwise_image(image);  // Create a copy of the original image
-
-        counterClockwise_image.rotate(false);  // Rotate the image counter-clockwise
-
-        counterClockwise_image.write(outputDir + "rotatedCounterClockwise_" + imageName);  // Save the rotated image
-    }
-
-    std::cout << imageName << " rotated counter-clockwise and saved to " << outputDir + "rotatedCounterClockwise_" + imageName << std::endl;
-
-    image.applyGaussianFilter(kernel, numThreads);  // Apply Gaussian filter to the original image
-
+    rotateAndSave(image, imageName, true, args.outputDir + "rotatedClockwise_" + imageName); // Rotate the image clockwise and save the result
+    
+    rotateAndSave(image, imageName, false, args.outputDir + "rotatedCounterClockwise_" + imageName); // Rotate the image counter-clockwise and save the result
+    
+    image.applyGaussianFilter(kernel, args.numThreads);  // Apply Gaussian filter to the original image
     std::cout << imageName << " Gaussian filtered" << std::endl;
 
-    // Rotate the filtered image clockwise
-    {
-        Bitmap clockwise_image(image);
-
-        clockwise_image.rotate(true);   // Rotate the image clockwise
-
-        clockwise_image.write(outputDir + "filteredRotatedClockwise_" + imageName);  // Save the rotated image
-    }
-
-    std::cout << "Filtered " << imageName << " rotated clockwise and saved to " << outputDir + "filteredRotatedClockwise_" + imageName << std::endl;
-
-    // Rotate the filtered image counter-clockwise
-    {
-        Bitmap counterClockwise_image(image);  // Create a copy of the original image
-
-        counterClockwise_image.rotate(false);  // Rotate the image counter-clockwise
-
-        counterClockwise_image.write(outputDir + "filteredRotatedCounterClockwise_" + imageName);  // Save the rotated image
-    }
-
-    std::cout << "Filtered " << imageName << " rotated counter-clockwise and saved to " << outputDir + "filteredRotatedCounterClockwise_" + imageName << std::endl;
-
+    rotateAndSave(image, imageName, true, args.outputDir + "filteredRotatedClockwise_" + imageName); // Rotate the filtered image clockwise and save the result
+    
+    rotateAndSave(image, imageName, false, args.outputDir + "filteredRotatedCounterClockwise_" + imageName); // Rotate the filtered image counter-clockwise and save the result
+    
     return 0;
 }
