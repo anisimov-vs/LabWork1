@@ -1,7 +1,7 @@
-#include "util.h"
+// Anisimov Vasiliy st129629@student.spbu.ru
+// Laboratory Work 1
 
-#include <unistd.h>
-#include <iostream>
+#include "util.h"
 
 // Function to print help message
 void printHelp() {
