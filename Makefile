@@ -19,7 +19,7 @@ OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 TARGET = $(BIN_DIR)/main
 
 # Default target
-all: $(TARGET)
+all: $(TARGET) clean
 
 # Link the object files to create the binary
 $(TARGET): $(OBJS)

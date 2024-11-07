@@ -34,11 +34,13 @@ make
 ### Usage
 
 ```
-Usage: main [options] [input_image] [output_dir] [num_threads]
+Usage: main [options] [input_image] [output_dir] [num_threads] [kernel_size] [sigma]
 Options:
   -i <input_image>     Specify the input image file  (default: image.bmp)
   -o <output_dir>      Specify the output directory  (default: output/)
   -n <num_threads>     Specify the number of threads (default: best possible)
+  -k <kernel_size>     Specify the kernel size (default: 5)
+  -s <sigma>           Specify the sigma (default: 1.0)
   -h                   Display this help message
-If input_image, output_dir or num_threads are not provided, default values are used
+If input_image, output_dir, num_threads, kernel_size or sigma are not provided, default values are used.
 ```

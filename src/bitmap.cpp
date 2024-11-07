@@ -319,7 +319,7 @@ void Bitmap::applyGaussianFilter(const std::vector<std::vector<float>>& kernel, 
     for (int i = 0; i < numThreads; ++i) {
         int startY = i * stripHeight;
         int endY = (i == numThreads - 1) ? height : (i + 1) * stripHeight;
-        
+
         threads.emplace_back(&Bitmap::applyGaussianFilterThread, this, std::ref(kernel), startY, endY);
     }
 
@@ -363,7 +363,7 @@ void Bitmap::applyGaussianFilterThread(const std::vector<std::vector<float>>& ke
 
 // Function to print help message
 void printHelp() {
-    std::cout << "Usage: main [options] [input_image] [output_dir] [num_threads]" << std::endl;
+    std::cout << "Usage: main [options] [input_image] [output_dir] [num_threads] [kernel_size] [sigma]" << std::endl;
     std::cout << "Options:" << std::endl;
     std::cout << "  -i <input_image>     Specify the input image file  (default: image.bmp)" << std::endl;
     std::cout << "  -o <output_dir>      Specify the output directory  (default: output/)" << std::endl;
@@ -371,7 +371,7 @@ void printHelp() {
     std::cout << "  -k <kernel_size>     Specify the kernel size (default: 5)" << std::endl;
     std::cout << "  -s <sigma>           Specify the sigma (default: 1.0)" << std::endl;
     std::cout << "  -h                   Display this help message" << std::endl;
-    std::cout << "If input_image, output_dir or num_threads are not provided, default values are used." << std::endl;
+    std::cout << "If input_image, output_dir, num_threads, kernel_size or sigma are not provided, default values are used." << std::endl;
 }
 
 Arguments readArgs(int argc, char* argv[]) {
