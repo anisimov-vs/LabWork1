@@ -2,7 +2,7 @@
 // Laboratory Work 1
 
 #include "bitmap.h"
-#include <iostream>
+#include "util.h"
 
 int main(int argc, char* argv[]) {
     Arguments args = readArgs(argc, argv);
