@@ -10,7 +10,9 @@ st129629@student.spbu.ru
 
 ## Description
 
-This project is a C++ program that reads an image from a file, rotates it clockwise and counterclockwise, and applies a Gaussian filter to it. The program then writes the rotated and filtered images to an output directory.
+This project is a C++ program that reads an image from a file, rotates it clockwise and counterclockwise, and applies a Gaussian filter to rotated images. The program then writes the rotated and filtered images to an output directory.
+
+It supports 1-, 8-, 16- and 24-bit both grayscale and colored images. Support of 8-bit colored images is limited.
 
 ### Files
 
