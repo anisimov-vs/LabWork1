@@ -4,6 +4,9 @@
 #include "bitmap.h"
 #include "util.h"
 
+#include <iostream>
+#include <vector>
+
 int main(int argc, char* argv[]) {
     Arguments args = readArgs(argc, argv);
     std::cout << "tfwnauyo" << std::endl;

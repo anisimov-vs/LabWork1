@@ -4,14 +4,8 @@
 #ifndef BITMAP_h
 #define BITMAP_h
 
-#include <cstdint>
-#include <fstream>
-#include <sstream>
+#include <string>
 #include <vector>
-#include <iostream>
-#include <cmath>
-#include <unistd.h>
-#include <thread>
 
 // Structure representing the BMP file header
 struct bmpFileHeader {

@@ -6,6 +6,9 @@
 
 #include "bitmap.h"
 
+#include <string>
+#include <vector>
+
 void printHelp();
 
 struct Arguments {
@@ -13,7 +16,7 @@ struct Arguments {
   std::string outputDir = "output/";
   int numThreads = 0;
   int kernelSize = 5;
-  float sigma = 1.2;
+  float sigma = 1.0;
 };
 
 Arguments readArgs(int argc, char* argv[]);

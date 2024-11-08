@@ -3,6 +3,12 @@
 
 #include "util.h"
 
+#include <iostream>
+#include <string>
+#include <unistd.h>
+#include <sstream>
+#include <thread>
+
 // Function to print help message
 void printHelp() {
     std::cout << "Usage: main [options] [input_image] [output_dir] [num_threads] [kernel_size] [sigma]" << std::endl;

@@ -4,6 +4,11 @@
 #include "bitmap.h"
 #include "util.h"
 
+#include <fstream>
+#include <vector>
+#include <iostream>
+#include <thread>
+
 // Load a BMP image from a file
 bool Bitmap::load(std::string fileName) {
     std::ifstream file(fileName, std::ios::binary);
