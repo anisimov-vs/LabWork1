@@ -32,8 +32,7 @@ bool Bitmap::load(std::string fileName) {
     bmpFileDibInfo dibInfo;
     file.read(reinterpret_cast<char*>(&dibInfo), sizeof(bmpFileDibInfo));
 
-    double requiredMemory = dibInfo.height * dibInfo.width * 3 / 1024;
-    std::cout << "Memory required to load " << fileName << ": " << requiredMemory << "KB" << std::endl;
+    std::cout << "Memory required to load " << fileName << ": " << dibInfo.height * dibInfo.width * 3 / 1024 << "KB" << std::endl;
     
     std::vector<std::vector<uint8_t>> palette;
     
@@ -56,7 +55,7 @@ bool Bitmap::load(std::string fileName) {
 
     file.seekg(header.bmpOffset, std::ios::beg);
 
-    // If it's a 1-bit monochrome image
+    // Handle 1-bit monochrome BMP
     if (dibInfo.bitsPerPixel == 1) {
         isGrayscale = true;
         // Read pixel data (each byte contains 8 pixels, packed as bits)
