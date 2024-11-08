@@ -3,6 +3,7 @@ CXX = g++
 
 # Compiler flags
 CXXFLAGS = -Werror -Wpedantic -Wall -std=c++17 -I$(SRC_DIR)
+LDFLAGS = -pthread
 
 # Directories
 SRC_DIR = src
@@ -19,7 +20,7 @@ OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 TARGET = $(BIN_DIR)/main
 
 # Default target
-all: $(TARGET) clean
+all: $(TARGET)
 
 # Link the object files to create the binary
 $(TARGET): $(OBJS)

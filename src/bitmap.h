@@ -50,7 +50,7 @@ class Bitmap {
   public:
     Bitmap() { } // Default constructor
 
-    Bitmap(std::string& filename) { load(filename); } // Constructor loading a bitmap from a file
+    Bitmap(const std::string& filename) { load(filename); } // Constructor loading a bitmap from a file
 
     // Copy constructor
     Bitmap(const Bitmap& other) : isGrayscale(other.isGrayscale), pixels(other.pixels) { }
@@ -58,10 +58,10 @@ class Bitmap {
     ~Bitmap() { }
 
     // Method to load a bitmap from a file
-    void load(std::string);
+    bool load(std::string);
 
     // Method to write a bitmap to a file
-    void write(std::string);
+    bool write(std::string);
 
     // Method to rotate the bitmap image
     void rotate(bool clockwise);

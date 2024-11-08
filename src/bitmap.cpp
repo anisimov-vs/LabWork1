@@ -5,12 +5,12 @@
 #include "util.h"
 
 // Load a BMP image from a file
-void Bitmap::load(std::string fileName) {
+bool Bitmap::load(std::string fileName) {
     std::ifstream file(fileName, std::ios::binary);
 
     if (!file.is_open()) {
         std::cerr << "Error: Could not open file " << fileName << std::endl;
-        exit(1);
+        return 0;
     }
 
     unsigned char fileType[2];
@@ -18,7 +18,7 @@ void Bitmap::load(std::string fileName) {
 
     if ((fileType[0] != 'B') || (fileType[1] != 'M')) {
         std::cerr << "Error: File is not a BMP file" << std::endl;
-        exit(1);
+        return 0;
     }
 
     bmpFileHeader header;
@@ -149,20 +149,22 @@ void Bitmap::load(std::string fileName) {
         }
     } else {
         std::cerr << "Error: Unsupported BMP format (only 1-bit, 8-bit grayscale, 16-bit, and 24-bit RGB are supported), your image is " << dibInfo.bitsPerPixel << " bits per pixel" << std::endl;
-        exit(1);
+        return 0;
     }
     std::cout << "Loaded " << getImageName(fileName) << " with " << dibInfo.width << "x" << dibInfo.height << " pixels and " << dibInfo.bitsPerPixel << " bits per pixel" << std::endl;
 
     file.close();
+
+    return 1;
 }
 
 // Write the BMP image to a file
-void Bitmap::write(std::string fileName) {
+bool Bitmap::write(std::string fileName) {
     std::ofstream file(fileName, std::ios::binary);
 
     if (!file) {
         std::cerr << "Error: Could not open file for writing." << std::endl;
-        return;
+        return 0;
     }
 
     file.write("BM", 2);
@@ -238,6 +240,8 @@ void Bitmap::write(std::string fileName) {
     }
 
     file.close();
+
+    return 1;
 }
 
 // Rotate the image 90 degrees clockwise or counterclockwise

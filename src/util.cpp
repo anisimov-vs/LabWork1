@@ -29,14 +29,14 @@ Arguments readArgs(int argc, char* argv[]) {
                     } catch (...) {
                         std::cerr << "Error: Invalid argument for -i option." << std::endl;
                         printHelp();
-                        exit(1);
+                        return Arguments{0};
                     }
                 } else {
                     std::cerr << "Error: -i option requires an argument." << std::endl;
                     printHelp();
-                    exit(1);
+                    std::cout << "tfwat\n";
+                    return Arguments{0};
                 }
-
                 break;
 
             case 'o':
@@ -46,12 +46,12 @@ Arguments readArgs(int argc, char* argv[]) {
                     } catch (...) {
                         std::cerr << "Error: Invalid argument for -o option." << std::endl;
                         printHelp();
-                        exit(1);
+                        return Arguments{0};
                     }
                 } else {
                     std::cerr << "Error: -o option requires an argument." << std::endl;
                     printHelp();
-                    exit(1);
+                    return Arguments{0};
                 }
 
                 break;
@@ -63,12 +63,12 @@ Arguments readArgs(int argc, char* argv[]) {
                     } catch (...) {
                         std::cerr << "Error: Invalid argument for -n option." << std::endl;
                         printHelp();
-                        exit(1);    
+                        return Arguments{0};    
                     }
                 } else {
                     std::cerr << "Error: -n option requires an argument." << std::endl;
                     printHelp();
-                    exit(1);
+                    return Arguments{0};
                 }
 
                 break;
@@ -80,12 +80,12 @@ Arguments readArgs(int argc, char* argv[]) {
                     } catch (...) {
                         std::cerr << "Error: Invalid argument for -k option." << std::endl;
                         printHelp();
-                        exit(1);    
+                        return Arguments{0}; 
                     }
                 } else {
                     std::cerr << "Error: -k option requires an argument." << std::endl;
                     printHelp();
-                    exit(1);
+                    return Arguments{0};
                 }
 
                 break;
@@ -97,23 +97,23 @@ Arguments readArgs(int argc, char* argv[]) {
                     } catch (...) {
                         std::cerr << "Error: Invalid argument for -s option." << std::endl;
                         printHelp();
-                        exit(1);    
+                        return Arguments{0};    
                     }
                 } else {
                     std::cerr << "Error: -s option requires an argument." << std::endl;
                     printHelp();
-                    exit(1);
+                    return Arguments{0};
                 }
 
                 break;
 
             case 'h':
                 printHelp();
-                exit(0);
+                return Arguments{0};
 
             default:
                 printHelp();
-                return args;
+                return Arguments{0};
         }
     }
 
@@ -136,7 +136,7 @@ Arguments readArgs(int argc, char* argv[]) {
     if (optind < argc) {
         std::cerr << "Error: Too many arguments." << std::endl;
         printHelp();
-        exit(1);
+        return Arguments{0};
     }
 
     if (args.numThreads <= 0) {
@@ -194,12 +194,14 @@ std::vector<std::vector<float> > generateGaussianKernel(int size, float sigma) {
     return kernel;
 }
 
-void rotateAndSave(Bitmap &image, std::string imageName, bool clockwise, std::string outputPath) {
+bool rotateAndSave(Bitmap &image, std::string imageName, bool clockwise, std::string outputPath) {
     Bitmap rotatedImage = Bitmap(image);
 
     rotatedImage.rotate(clockwise);
     
-    rotatedImage.write(outputPath);
+    if (!rotatedImage.write(outputPath)) return 0;
 
     std::cout << imageName << " rotated " << (clockwise ? "clockwise" : "counter-clockwise") << " and saved to " << outputPath << std::endl;
+
+    return 1;
 }
