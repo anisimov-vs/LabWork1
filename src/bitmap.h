@@ -7,28 +7,30 @@
 #include <string>
 #include <vector>
 
-// Structure representing the BMP file header
+#pragma pack(push, 1)  // Start byte-aligned packing
+
 struct bmpFileHeader {
-  uint32_t fileSize;       // Size of the BMP file in bytes
-  uint16_t reserved1;      // Reserved; actual value depends on the application that creates the image
-  uint16_t reserved2;      // Reserved; actual value depends on the application that creates the image
-  uint32_t bmpOffset;      // Offset where the pixel array (bitmap data) can be found
+    uint32_t fileSize;
+    uint16_t reserved1;
+    uint16_t reserved2;
+    uint32_t bmpOffset;
 };
 
-// Structure containing DIB header information of a BMP file
 struct bmpFileDibInfo {
-  uint32_t headerSize;         // Size of this header
-  int32_t width;               // Bitmap width in pixels
-  int32_t height;              // Bitmap height in pixels
-  uint16_t planes;             // Number of color planes being used
-  uint16_t bitsPerPixel;       // Number of bits per pixel
-  uint32_t compression;        // Compression method being used
-  uint32_t imageSize;          // Size of the raw bitmap data
-  int32_t xPixelsPerMeter;     // Horizontal resolution of the image (pixel per meter)
-  int32_t yPixelsPerMeter;     // Vertical resolution of the image (pixel per meter)
-  uint32_t colorsUsed;         // Number of colors in the color palette
-  uint32_t importantColors;    // Number of important colors used
+    uint32_t headerSize;
+    int32_t width;
+    int32_t height;
+    uint16_t planes;
+    uint16_t bitsPerPixel;
+    uint32_t compression;
+    uint32_t imageSize;
+    int32_t xPixelsPerMeter;
+    int32_t yPixelsPerMeter;
+    uint32_t colorsUsed;
+    uint32_t importantColors;
 };
+
+#pragma pack(pop)  // Restore default packing
 
 struct Pixel {
   uint8_t red, green, blue;

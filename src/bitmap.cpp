@@ -70,9 +70,9 @@ bool Bitmap::load(std::string fileName) {
 
                     Pixel pixel;
 
-                    pixel.blue = 255 * colorIndex;
-                    pixel.green = 255 * colorIndex;
-                    pixel.red = 255 * colorIndex;
+                    pixel.blue = 255 * !colorIndex;
+                    pixel.green = 255 * !colorIndex;
+                    pixel.red = 255 * !colorIndex;
 
                     pixelRow.push_back(pixel);
                 }

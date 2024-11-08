@@ -40,7 +40,6 @@ Arguments readArgs(int argc, char* argv[]) {
                 } else {
                     std::cerr << "Error: -i option requires an argument." << std::endl;
                     printHelp();
-                    std::cout << "tfwat\n";
                     return Arguments{0};
                 }
                 break;

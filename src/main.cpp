@@ -9,7 +9,7 @@
 
 int main(int argc, char* argv[]) {
     Arguments args = readArgs(argc, argv);
-    std::cout << "tfwnauyo" << std::endl;
+    
     if (args.inputImage == "0") return 0;
 
     std::vector<std::vector<float>> kernel = generateGaussianKernel(args.kernelSize, args.sigma);  // Generate the Gaussian kernel
