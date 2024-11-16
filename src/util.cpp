@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <sstream>
 #include <thread>
+#include <cmath>
 
 // Function to print help message
 void printHelp() {

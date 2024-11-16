@@ -44,7 +44,7 @@ bool Bitmap::load(std::string fileName) {
         
         palette.resize(dibInfo.colorsUsed, std::vector<uint8_t>(4));
 
-        for (int i = 0; i < dibInfo.colorsUsed; i++) {
+        for (int i = 0; i < (int)dibInfo.colorsUsed; i++) {
             file.read(reinterpret_cast<char*>(palette[i].data()), 4);
 
             if (palette[i][0] != palette[i][1] || palette[i][1] != palette[i][2] || palette[i][0] != palette[i][2]) {
