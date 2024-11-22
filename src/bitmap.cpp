@@ -55,14 +55,18 @@ bool Bitmap::load(std::string fileName) {
 
     file.seekg(header.bmpOffset, std::ios::beg);
 
-    // Handle 1-bit monochrome BMP
+    // Handle 1-bit monochrome BMP 
     if (dibInfo.bitsPerPixel == 1) {
         isGrayscale = true;
         // Read pixel data (each byte contains 8 pixels, packed as bits)
         for (int x = 0; x < dibInfo.height; x++) {
             std::vector<Pixel> pixelRow;
+            std::vector<uint8_t> byteRow((dibInfo.width + 7) / 8);
+
+            file.read(reinterpret_cast<char*>(byteRow.data()), (dibInfo.width + 7) / 8);
+            
             for (int y = 0; y < (dibInfo.width + 7) / 8; y++) {
-                uint8_t byte = file.get();  // Read one byte (8 pixels)
+                uint8_t byte = byteRow[y];
 
                 for (int bit = 0; bit < 8 && y * 8 + bit < dibInfo.width; bit++) {
                     uint8_t colorIndex = (byte >> (7 - bit)) & 0x01;
@@ -87,9 +91,12 @@ bool Bitmap::load(std::string fileName) {
 
         for (int x = 0; x < dibInfo.height; x++) {
             std::vector<Pixel> pixelRow;
+            std::vector<uint8_t> byteRow(dibInfo.width);
+
+            file.read(reinterpret_cast<char*>(byteRow.data()), dibInfo.width);
 
             for (int y = 0; y < dibInfo.width; y++) {
-                uint8_t index = file.get();
+                uint8_t index = byteRow[y];
 
                 Pixel pixel;
 
@@ -111,9 +118,12 @@ bool Bitmap::load(std::string fileName) {
 
         for (int x = 0; x < dibInfo.height; x++) {
             std::vector<Pixel> pixelRow;
+            std::vector<uint16_t> byteRow(dibInfo.width);
+
+            file.read(reinterpret_cast<char*>(byteRow.data()), dibInfo.width * sizeof(uint16_t));
 
             for (int y = 0; y < dibInfo.width; y++) {
-                uint16_t pixelValue = (file.get() | (file.get() << 8));
+                uint16_t pixelValue = byteRow[y];
                 
                 Pixel pixel;
                 
@@ -136,13 +146,16 @@ bool Bitmap::load(std::string fileName) {
 
         for (int x = 0; x < dibInfo.height; x++) {
             std::vector<Pixel> pixelRow;
+            std::vector<uint8_t> byteRow(dibInfo.width * 3);
+
+            file.read(reinterpret_cast<char*>(byteRow.data()), dibInfo.width * 3);
 
             for (int y = 0; y < dibInfo.width; y++) {
                 Pixel pixel;
 
-                pixel.blue = file.get();
-                pixel.green = file.get();
-                pixel.red = file.get();    
+                pixel.blue = byteRow[y * 3];
+                pixel.green = byteRow[y * 3 + 1];
+                pixel.red = byteRow[y * 3 + 2];    
 
                 pixelRow.push_back(pixel);
             }
@@ -223,6 +236,7 @@ bool Bitmap::write(std::string fileName) {
 
     // Preallocate a buffer large enough for one row plus padding
     std::vector<char> buffer(rowSize + paddingSize, 0); // Initialize padding bytes to 0
+    std::fill_n(buffer.begin(), rowSize + paddingSize, 0);
 
     for (int x = dibInfo.height - 1; x >= 0; x--) {
         const std::vector<Pixel> &rowPixels = pixels[x];
