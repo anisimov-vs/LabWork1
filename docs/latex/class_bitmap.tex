@@ -1,0 +1,138 @@
+\doxysection{Bitmap Class Reference}
+\hypertarget{class_bitmap}{}\label{class_bitmap}\index{Bitmap@{Bitmap}}
+
+
+Encapsulates BMP image data and provides basic image operations.  
+
+
+
+
+{\ttfamily \#include $<$bitmap.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_bitmap_aa6ef6d8c0b66664350ef4dd062db3aec}\label{class_bitmap_aa6ef6d8c0b66664350ef4dd062db3aec} 
+{\bfseries Bitmap} ()
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_bitmap_a5a26ccbab9af0b40421eacc21e75536d}{Bitmap}} (const std\+::string \&filename)
+\begin{DoxyCompactList}\small\item\em Constructs and loads a BMP from file. \end{DoxyCompactList}\item 
+\Hypertarget{class_bitmap_ab2c959aead2337b8fc9e89866d5d120d}\label{class_bitmap_ab2c959aead2337b8fc9e89866d5d120d} 
+{\bfseries Bitmap} (const \mbox{\hyperlink{class_bitmap}{Bitmap}} \&other)
+\begin{DoxyCompactList}\small\item\em Copy constructor. \end{DoxyCompactList}\item 
+\Hypertarget{class_bitmap_a72d2a301ec1eb1c8d0f3d64823659a8e}\label{class_bitmap_a72d2a301ec1eb1c8d0f3d64823659a8e} 
+{\bfseries \texorpdfstring{$\sim$}{\string~}\+Bitmap} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_bitmap_ab0349ea7d0844a8a75a10d719a0e3d7e}{load}} (const std\+::string \&filename)
+\begin{DoxyCompactList}\small\item\em Loads a BMP image from a file. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_bitmap_a1f19cdc23953e08e5122bc4b2a516242}{write}} (const std\+::string \&filename)
+\begin{DoxyCompactList}\small\item\em Writes the BMP image to a file. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_bitmap_a29933464589b02108185486c28aad895}{rotate}} (bool clockwise)
+\begin{DoxyCompactList}\small\item\em Rotates the image 90 degrees. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_bitmap_a4a2c39f0929b73c6eee20dc45b13cbf0}{apply\+Gaussian\+Filter}} (const std\+::vector$<$ std\+::vector$<$ float $>$ $>$ \&kernel, int num\+Threads)
+\begin{DoxyCompactList}\small\item\em Applies a Gaussian filter to the image. \end{DoxyCompactList}\item 
+\Hypertarget{class_bitmap_a1c1acb339adfa52889f817841d8417b8}\label{class_bitmap_a1c1acb339adfa52889f817841d8417b8} 
+void {\bfseries apply\+Gaussian\+Filter\+Thread} (const std\+::vector$<$ std\+::vector$<$ float $>$ $>$ \&kernel, int startY, int endY)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Encapsulates BMP image data and provides basic image operations. 
+
+\label{doc-constructors}
+\Hypertarget{class_bitmap_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_bitmap_a5a26ccbab9af0b40421eacc21e75536d}\index{Bitmap@{Bitmap}!Bitmap@{Bitmap}}
+\index{Bitmap@{Bitmap}!Bitmap@{Bitmap}}
+\doxysubsubsection{\texorpdfstring{Bitmap()}{Bitmap()}}
+{\footnotesize\ttfamily \label{class_bitmap_a5a26ccbab9af0b40421eacc21e75536d} 
+Bitmap\+::\+Bitmap (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{filename}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Constructs and loads a BMP from file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & Path to the BMP file. \\
+\hline
+\end{DoxyParams}
+
+
+\label{doc-func-members}
+\Hypertarget{class_bitmap_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_bitmap_a4a2c39f0929b73c6eee20dc45b13cbf0}\index{Bitmap@{Bitmap}!applyGaussianFilter@{applyGaussianFilter}}
+\index{applyGaussianFilter@{applyGaussianFilter}!Bitmap@{Bitmap}}
+\doxysubsubsection{\texorpdfstring{applyGaussianFilter()}{applyGaussianFilter()}}
+{\footnotesize\ttfamily \label{class_bitmap_a4a2c39f0929b73c6eee20dc45b13cbf0} 
+void Bitmap\+::apply\+Gaussian\+Filter (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::vector$<$ float $>$ $>$ \&}]{kernel}{, }\item[{int}]{num\+Threads}{}\end{DoxyParamCaption})}
+
+
+
+Applies a Gaussian filter to the image. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em kernel} & Gaussian kernel matrix. \\
+\hline
+{\em num\+Threads} & Number of threads to use. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_bitmap_ab0349ea7d0844a8a75a10d719a0e3d7e}\index{Bitmap@{Bitmap}!load@{load}}
+\index{load@{load}!Bitmap@{Bitmap}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily \label{class_bitmap_ab0349ea7d0844a8a75a10d719a0e3d7e} 
+bool Bitmap\+::load (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{filename}{}\end{DoxyParamCaption})}
+
+
+
+Loads a BMP image from a file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & Path to the BMP file. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True on success, false on failure. 
+\end{DoxyReturn}
+\Hypertarget{class_bitmap_a29933464589b02108185486c28aad895}\index{Bitmap@{Bitmap}!rotate@{rotate}}
+\index{rotate@{rotate}!Bitmap@{Bitmap}}
+\doxysubsubsection{\texorpdfstring{rotate()}{rotate()}}
+{\footnotesize\ttfamily \label{class_bitmap_a29933464589b02108185486c28aad895} 
+void Bitmap\+::rotate (\begin{DoxyParamCaption}\item[{bool}]{clockwise}{}\end{DoxyParamCaption})}
+
+
+
+Rotates the image 90 degrees. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em clockwise} & True for clockwise, false for counter-\/clockwise. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_bitmap_a1f19cdc23953e08e5122bc4b2a516242}\index{Bitmap@{Bitmap}!write@{write}}
+\index{write@{write}!Bitmap@{Bitmap}}
+\doxysubsubsection{\texorpdfstring{write()}{write()}}
+{\footnotesize\ttfamily \label{class_bitmap_a1f19cdc23953e08e5122bc4b2a516242} 
+bool Bitmap\+::write (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{filename}{}\end{DoxyParamCaption})}
+
+
+
+Writes the BMP image to a file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & Output file path. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True on success, false on failure. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\mbox{\hyperlink{bitmap_8h}{bitmap.\+h}}\item 
+src/bitmap.\+cpp\end{DoxyCompactItemize}

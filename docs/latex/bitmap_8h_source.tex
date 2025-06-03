@@ -1,0 +1,72 @@
+\doxysection{bitmap.\+h}
+\hypertarget{bitmap_8h_source}{}\label{bitmap_8h_source}\index{src/bitmap.h@{src/bitmap.h}}
+\mbox{\hyperlink{bitmap_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ Anisimov\ Vasiliy\ st129629@student.spbu.ru}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Laboratory\ Work\ 1}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#ifndef\ BITMAP\_h}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#define\ BITMAP\_h}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#pragma\ pack(push,\ 1)\ \ }\textcolor{comment}{//\ Start\ byte-\/aligned\ packing}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00021\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbmp_file_header}{bmpFileHeader}}\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structbmp_file_header_a90ed421443e5d177e442f1a4662d03da}{fileSize}};}
+\DoxyCodeLine{00025\ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structbmp_file_header_a837965b6b5d6f521a0776fa2e86f9442}{reserved1}};}
+\DoxyCodeLine{00027\ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structbmp_file_header_a410b9f70c79dd15c17989a70b71bff4b}{reserved2}};}
+\DoxyCodeLine{00029\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structbmp_file_header_a778d45d644ca3b36955e2a84447c8a04}{bmpOffset}};}
+\DoxyCodeLine{00030\ \};}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00036\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structbmp_file_dib_info}{bmpFileDibInfo}}\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structbmp_file_dib_info_a50bcfac6c56b5ea2a4e0be903b16f0a0}{headerSize}};}
+\DoxyCodeLine{00040\ \ \ \ \ int32\_t\ \mbox{\hyperlink{structbmp_file_dib_info_a297f102b183bf37da96d6315cf41c565}{width}};}
+\DoxyCodeLine{00042\ \ \ \ \ int32\_t\ \mbox{\hyperlink{structbmp_file_dib_info_ad98b740d4222e2525e228f163d46871c}{height}};}
+\DoxyCodeLine{00044\ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structbmp_file_dib_info_aa04f51172e2292336f682329b82e27c6}{planes}};}
+\DoxyCodeLine{00046\ \ \ \ \ uint16\_t\ \mbox{\hyperlink{structbmp_file_dib_info_a99f26f427204eeefbf368d738b217479}{bitsPerPixel}};}
+\DoxyCodeLine{00048\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structbmp_file_dib_info_a0b9a682527aec1c215f323cd664a6e82}{compression}};}
+\DoxyCodeLine{00050\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structbmp_file_dib_info_ae6783a1843dca59d7215fe1b31efc30e}{imageSize}};}
+\DoxyCodeLine{00052\ \ \ \ \ int32\_t\ \mbox{\hyperlink{structbmp_file_dib_info_a4571e548c25ff6255f3ebd9280518f85}{xPixelsPerMeter}};}
+\DoxyCodeLine{00054\ \ \ \ \ int32\_t\ \mbox{\hyperlink{structbmp_file_dib_info_ade2d64fab1607323f030b08ae3bc0f89}{yPixelsPerMeter}};}
+\DoxyCodeLine{00056\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structbmp_file_dib_info_a0a057a99468f08958e81a806051f1d51}{colorsUsed}};}
+\DoxyCodeLine{00058\ \ \ \ \ uint32\_t\ \mbox{\hyperlink{structbmp_file_dib_info_abf59868ca4e898262110d44d4e15ea30}{importantColors}};}
+\DoxyCodeLine{00059\ \};}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#pragma\ pack(pop)\ \ }\textcolor{comment}{//\ Restore\ default\ packing}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00067\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_pixel}{Pixel}}\ \{}
+\DoxyCodeLine{00068\ \ \ \ \ uint8\_t\ red,\ green,\ blue;}
+\DoxyCodeLine{00069\ \};}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00075\ \textcolor{keyword}{class\ }\mbox{\hyperlink{class_bitmap_aa6ef6d8c0b66664350ef4dd062db3aec}{Bitmap}}\ \{}
+\DoxyCodeLine{00076\ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordtype}{bool}\ isGrayscale;}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ std::vector<std::vector<Pixel>>\ pixels;\ }
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00083\ \ \ \ \ \mbox{\hyperlink{class_bitmap_aa6ef6d8c0b66664350ef4dd062db3aec}{Bitmap}}()\ \{\ \}\ \textcolor{comment}{//\ Default\ constructor}}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00089\ \ \ \ \ \mbox{\hyperlink{class_bitmap_a5a26ccbab9af0b40421eacc21e75536d}{Bitmap}}(\textcolor{keyword}{const}\ std::string\&\ filename)\ \{\ \mbox{\hyperlink{class_bitmap_ab0349ea7d0844a8a75a10d719a0e3d7e}{load}}(filename);\ \}\ \textcolor{comment}{//\ Constructor}}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00092\ \ \ \ \ \mbox{\hyperlink{class_bitmap_ab2c959aead2337b8fc9e89866d5d120d}{Bitmap}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{class_bitmap_aa6ef6d8c0b66664350ef4dd062db3aec}{Bitmap}}\&\ other)\ :\ isGrayscale(other.isGrayscale),\ pixels(other.pixels)\ \{\ \}}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00095\ \ \ \ \ \mbox{\hyperlink{class_bitmap_a72d2a301ec1eb1c8d0f3d64823659a8e}{\string~Bitmap}}()\ \{\ \}}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_bitmap_ab0349ea7d0844a8a75a10d719a0e3d7e}{load}}(\textcolor{keyword}{const}\ std::string\ \&filename);\ \textcolor{comment}{//}}
+\DoxyCodeLine{00103\ }
+\DoxyCodeLine{00109\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{class_bitmap_a1f19cdc23953e08e5122bc4b2a516242}{write}}(\textcolor{keyword}{const}\ std::string\ \&filename);}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00115\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_bitmap_a29933464589b02108185486c28aad895}{rotate}}(\textcolor{keywordtype}{bool}\ clockwise);}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00122\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{class_bitmap_a4a2c39f0929b73c6eee20dc45b13cbf0}{applyGaussianFilter}}(\textcolor{keyword}{const}\ std::vector<std::vector<float>>\&\ kernel,\ \textcolor{keywordtype}{int}\ numThreads);}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordtype}{void}\ applyGaussianFilterThread(\textcolor{keyword}{const}\ std::vector<std::vector<float>>\&\ kernel,\ \textcolor{keywordtype}{int}\ startY,\ \textcolor{keywordtype}{int}\ endY);}
+\DoxyCodeLine{00132\ \};}
+\DoxyCodeLine{00133\ }
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,37 @@
+\doxysection{util.\+h}
+\hypertarget{util_8h_source}{}\label{util_8h_source}\index{src/util.h@{src/util.h}}
+\mbox{\hyperlink{util_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ Anisimov\ Vasiliy\ st129629@student.spbu.ru}}
+\DoxyCodeLine{00002\ \textcolor{comment}{//\ Laboratory\ Work\ 1}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#ifndef\ UTIL\_h}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#define\ UTIL\_h}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}\mbox{\hyperlink{bitmap_8h}{bitmap.h}}"{}}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00018\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{util_8h_a0d20b69b0ad703df78459e1033d5c1d4}{printHelp}}();}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_arguments}{Arguments}}\ \{}
+\DoxyCodeLine{00026\ \ \ std::string\ \mbox{\hyperlink{struct_arguments_a92cdddbf628cd14c8c29b31f1e7e1c53}{inputImage}}\ =\ \textcolor{stringliteral}{"{}image.bmp"{}};\ }
+\DoxyCodeLine{00028\ \ \ std::string\ \mbox{\hyperlink{struct_arguments_a52d13dcaf8a0437e58d43d2dd1553061}{outputDir}}\ =\ \textcolor{stringliteral}{"{}output/"{}};}
+\DoxyCodeLine{00030\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_arguments_a8f973451210de315b0fcdfbac50f51c2}{numThreads}}\ =\ 0;}
+\DoxyCodeLine{00032\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{struct_arguments_ac6c22ec6fda1717fa896da5be15b81d9}{kernelSize}}\ =\ 5;}
+\DoxyCodeLine{00034\ \ \ \textcolor{keywordtype}{float}\ \mbox{\hyperlink{struct_arguments_a6ecf6ae002ef0b1d6d8dde41b97c895d}{sigma}}\ =\ 1.0;}
+\DoxyCodeLine{00035\ \};}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00043\ \mbox{\hyperlink{struct_arguments}{Arguments}}\ \mbox{\hyperlink{util_8h_a724ffa31a9e7aa114273ff75fee3e959}{readArgs}}(\textcolor{keywordtype}{int}\ argc,\ \textcolor{keywordtype}{char}*\ argv[]);}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00050\ std::string\ \mbox{\hyperlink{util_8h_a1c78fecd58d74533be80c21aeb8c1791}{getImageName}}(\textcolor{keyword}{const}\ std::string\ \&imagePath);}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00058\ std::vector<std::vector<float>>\ \mbox{\hyperlink{util_8h_a3f9052713088c87f262ee8a03f090c28}{generateGaussianKernel}}(\textcolor{keywordtype}{int}\ size,\ \textcolor{keywordtype}{float}\ sigma);}
+\DoxyCodeLine{00059\ }
+\DoxyCodeLine{00068\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{util_8h_afaf56f1c3afcf381a872ad3e290f93b7}{rotateAndSave}}(\mbox{\hyperlink{class_bitmap}{Bitmap}}\ \&image,\ \textcolor{keyword}{const}\ std::string\ \&imageName,\ \textcolor{keywordtype}{bool}\ clockwise,\ \textcolor{keyword}{const}\ std::string\ \&outputPath);}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

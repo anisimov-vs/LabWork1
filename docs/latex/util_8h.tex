@@ -1,0 +1,121 @@
+\doxysection{src/util.h File Reference}
+\hypertarget{util_8h}{}\label{util_8h}\index{src/util.h@{src/util.h}}
+
+
+Utility functions for argument parsing, filename handling, and image rotation tasks.  
+
+
+{\ttfamily \#include "{}bitmap.\+h"{}}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+\doxysubsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_arguments}{Arguments}}
+\begin{DoxyCompactList}\small\item\em Stores command-\/line argument values for the application. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{util_8h_a0d20b69b0ad703df78459e1033d5c1d4}\label{util_8h_a0d20b69b0ad703df78459e1033d5c1d4} 
+void {\bfseries print\+Help} ()
+\begin{DoxyCompactList}\small\item\em Prints usage information to stdout. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{struct_arguments}{Arguments}} \mbox{\hyperlink{util_8h_a724ffa31a9e7aa114273ff75fee3e959}{read\+Args}} (int argc, char \texorpdfstring{$\ast$}{*}argv\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Parses command-\/line arguments. \end{DoxyCompactList}\item 
+std\+::string \mbox{\hyperlink{util_8h_a1c78fecd58d74533be80c21aeb8c1791}{get\+Image\+Name}} (const std\+::string \&image\+Path)
+\begin{DoxyCompactList}\small\item\em Extracts the filename from a full path. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ float $>$ $>$ \mbox{\hyperlink{util_8h_a3f9052713088c87f262ee8a03f090c28}{generate\+Gaussian\+Kernel}} (int size, float sigma)
+\begin{DoxyCompactList}\small\item\em Generates a 2D Gaussian kernel. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{util_8h_afaf56f1c3afcf381a872ad3e290f93b7}{rotate\+And\+Save}} (\mbox{\hyperlink{class_bitmap}{Bitmap}} \&image, const std\+::string \&image\+Name, bool clockwise, const std\+::string \&output\+Path)
+\begin{DoxyCompactList}\small\item\em Rotates an image and saves the result to disk. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Utility functions for argument parsing, filename handling, and image rotation tasks. 
+
+
+
+\label{doc-func-members}
+\Hypertarget{util_8h_doc-func-members}
+\doxysubsection{Function Documentation}
+\Hypertarget{util_8h_a3f9052713088c87f262ee8a03f090c28}\index{util.h@{util.h}!generateGaussianKernel@{generateGaussianKernel}}
+\index{generateGaussianKernel@{generateGaussianKernel}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{generateGaussianKernel()}{generateGaussianKernel()}}
+{\footnotesize\ttfamily \label{util_8h_a3f9052713088c87f262ee8a03f090c28} 
+std\+::vector$<$ std\+::vector$<$ float $>$ $>$ generate\+Gaussian\+Kernel (\begin{DoxyParamCaption}\item[{int}]{size}{, }\item[{float}]{sigma}{}\end{DoxyParamCaption})}
+
+
+
+Generates a 2D Gaussian kernel. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em size} & Kernel dimension (must be odd). \\
+\hline
+{\em sigma} & Standard deviation for Gaussian distribution. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A 2D vector representing the normalized kernel. 
+\end{DoxyReturn}
+\Hypertarget{util_8h_a1c78fecd58d74533be80c21aeb8c1791}\index{util.h@{util.h}!getImageName@{getImageName}}
+\index{getImageName@{getImageName}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{getImageName()}{getImageName()}}
+{\footnotesize\ttfamily \label{util_8h_a1c78fecd58d74533be80c21aeb8c1791} 
+std\+::string get\+Image\+Name (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{image\+Path}{}\end{DoxyParamCaption})}
+
+
+
+Extracts the filename from a full path. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em image\+Path} & Full image file path. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The filename component without directory prefixes. 
+\end{DoxyReturn}
+\Hypertarget{util_8h_a724ffa31a9e7aa114273ff75fee3e959}\index{util.h@{util.h}!readArgs@{readArgs}}
+\index{readArgs@{readArgs}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{readArgs()}{readArgs()}}
+{\footnotesize\ttfamily \label{util_8h_a724ffa31a9e7aa114273ff75fee3e959} 
+\mbox{\hyperlink{struct_arguments}{Arguments}} read\+Args (\begin{DoxyParamCaption}\item[{int}]{argc}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{argv}{\mbox{[}$\,$\mbox{]}}\end{DoxyParamCaption})}
+
+
+
+Parses command-\/line arguments. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & Argument count. \\
+\hline
+{\em argv} & Argument values. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Filled \doxylink{struct_arguments}{Arguments} struct, or default-\/initialized on error. 
+\end{DoxyReturn}
+\Hypertarget{util_8h_afaf56f1c3afcf381a872ad3e290f93b7}\index{util.h@{util.h}!rotateAndSave@{rotateAndSave}}
+\index{rotateAndSave@{rotateAndSave}!util.h@{util.h}}
+\doxysubsubsection{\texorpdfstring{rotateAndSave()}{rotateAndSave()}}
+{\footnotesize\ttfamily \label{util_8h_afaf56f1c3afcf381a872ad3e290f93b7} 
+bool rotate\+And\+Save (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_bitmap}{Bitmap}} \&}]{image}{, }\item[{const std\+::string \&}]{image\+Name}{, }\item[{bool}]{clockwise}{, }\item[{const std\+::string \&}]{output\+Path}{}\end{DoxyParamCaption})}
+
+
+
+Rotates an image and saves the result to disk. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em image} & \doxylink{class_bitmap}{Bitmap} instance to rotate. \\
+\hline
+{\em image\+Name} & Base name for logging output messages. \\
+\hline
+{\em clockwise} & True for clockwise rotation, false for counter-\/clockwise. \\
+\hline
+{\em output\+Path} & File path to save the rotated image. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True on success, false on failure. 
+\end{DoxyReturn}
