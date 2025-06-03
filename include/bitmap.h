@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
 /**
  * @file bitmap.h

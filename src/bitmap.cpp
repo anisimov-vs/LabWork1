@@ -308,7 +308,11 @@ void Bitmap::applyGaussianFilter(const std::vector<std::vector<float>>& kernel, 
         threads.emplace_back([&, halfK]() {
             int i;
             while ((i = nextRow.fetch_add(1, std::memory_order_relaxed)) < rows) {
+                #if defined(__clang__)
+                #pragma clang loop vectorize(enable) interleave(enable)
+                #elif defined(__GNUC__)
                 #pragma GCC ivdep
+                #endif
                 for (int j = 0; j < cols; ++j) {
                     float r = 0.0f, g = 0.0f, b = 0.0f;
                     for (int di = -halfK; di <= halfK; ++di) {
