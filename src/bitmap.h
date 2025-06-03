@@ -54,10 +54,10 @@ class Bitmap {
     ~Bitmap() { }
 
     // Method to load a bitmap from a file
-    bool load(std::string);
+    bool load(const std::string &filename); //
 
     // Method to write a bitmap to a file
-    bool write(std::string);
+    bool write(const std::string &filename);
 
     // Method to rotate the bitmap image
     void rotate(bool clockwise);

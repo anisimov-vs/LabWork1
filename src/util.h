@@ -21,11 +21,11 @@ struct Arguments {
 
 Arguments readArgs(int argc, char* argv[]);
 // Function to extract the image name from a file path
-std::string getImageName(std::string &imagePath);
+std::string getImageName(const std::string &imagePath);
 
 // Function to generate a Gaussian kernel
 std::vector<std::vector<float>> generateGaussianKernel(int size, float sigma);
 
-bool rotateAndSave(Bitmap &image, std::string imageName, bool clockwise, std::string outputPath);
+bool rotateAndSave(Bitmap &image, const std::string &imageName, bool clockwise, const std::string &outputPath);
 
 #endif

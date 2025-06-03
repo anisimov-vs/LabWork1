@@ -8,9 +8,12 @@
 #include <vector>
 #include <iostream>
 #include <thread>
+#include <algorithm>
+#include <atomic>
+
 
 // Load a BMP image from a file
-bool Bitmap::load(std::string fileName) {
+bool Bitmap::load(const std::string &fileName) {
     std::ifstream file(fileName, std::ios::binary);
 
     if (!file.is_open()) {
@@ -35,6 +38,7 @@ bool Bitmap::load(std::string fileName) {
     std::cout << "Memory required to load " << fileName << ": " << dibInfo.height * dibInfo.width * 3 / 1024 << "KB" << std::endl;
     
     std::vector<std::vector<uint8_t>> palette;
+    palette.resize(256, std::vector<uint8_t>(4));
     
     // Read palette if 8-bit
     if (dibInfo.bitsPerPixel == 8) {
@@ -176,7 +180,7 @@ bool Bitmap::load(std::string fileName) {
 }
 
 // Write the BMP image to a file
-bool Bitmap::write(std::string fileName) {
+bool Bitmap::write(const std::string &fileName) {
     std::ofstream file(fileName, std::ios::binary);
 
     if (!file) {
@@ -284,53 +288,53 @@ void Bitmap::rotate(bool clockwise) {
 
 
 void Bitmap::applyGaussianFilter(const std::vector<std::vector<float>>& kernel, int numThreads) {
-    int height = pixels[0].size();
+    int rows = pixels.size();
+    if (rows == 0) return;
+    int cols = pixels[0].size();
 
-    int stripHeight = height / numThreads;
+    // Copy original pixels for thread-safe reads
+    auto original = pixels;
+
+    // Prepare buffer for filtered output
+    std::vector<std::vector<Pixel>> newPixels(rows, std::vector<Pixel>(cols));
+
+    // Atomic index for dynamic scheduling
+    std::atomic<int> nextRow{0};
+
+    int halfK = kernel.size() / 2;
     std::vector<std::thread> threads;
 
-    for (int i = 0; i < numThreads; ++i) {
-        int startY = i * stripHeight;
-        int endY = (i == numThreads - 1) ? height : (i + 1) * stripHeight;
-
-        threads.emplace_back(&Bitmap::applyGaussianFilterThread, this, std::ref(kernel), startY, endY);
-    }
-
-    for (auto&& thread : threads) {
-        thread.join();
-    }
-}
-
-void Bitmap::applyGaussianFilterThread(const std::vector<std::vector<float>>& kernel, int startY, int endY) {
-    int width = pixels.size();
-    int height = pixels[0].size();
-    int halfKernelSize = kernel.size() / 2;
-
-    for (int x = 0; x < width; x++) {
-        for (int y = startY; y < endY; y++) {
-            float red = 0.0, green = 0.0, blue = 0.0;
-
-            // Convolve the kernel with the image
-            for (int i = -halfKernelSize; i <= halfKernelSize; i++) {
-                for (int j = -halfKernelSize; j <= halfKernelSize; j++) {
-                    int nx = x + i;
-                    int ny = y + j;
-
-                    if (nx < 0) nx = 0;
-                    if (nx >= width) nx = width - 1;
-                    if (ny < 0) ny = 0;
-                    if (ny >= height) ny = height - 1;
-
-                    red += pixels[nx][ny].red * kernel[i + halfKernelSize][j + halfKernelSize];
-                    green += pixels[nx][ny].green * kernel[i + halfKernelSize][j + halfKernelSize];
-                    blue += pixels[nx][ny].blue * kernel[i + halfKernelSize][j + halfKernelSize];
+    for (int t = 0; t < numThreads; ++t) {
+        threads.emplace_back([&, halfK]() {
+            int i;
+            while ((i = nextRow.fetch_add(1, std::memory_order_relaxed)) < rows) {
+                #pragma GCC ivdep
+                for (int j = 0; j < cols; ++j) {
+                    float r = 0.0f, g = 0.0f, b = 0.0f;
+                    for (int di = -halfK; di <= halfK; ++di) {
+                        for (int dj = -halfK; dj <= halfK; ++dj) {
+                            int ni = std::clamp(i + di, 0, rows - 1);
+                            int nj = std::clamp(j + dj, 0, cols - 1);
+                            float weight = kernel[di + halfK][dj + halfK];
+                            const Pixel &p = original[ni][nj];
+                            r += p.red * weight;
+                            g += p.green * weight;
+                            b += p.blue * weight;
+                        }
+                    }
+                    newPixels[i][j].red = static_cast<uint8_t>(r);
+                    newPixels[i][j].green = static_cast<uint8_t>(g);
+                    newPixels[i][j].blue = static_cast<uint8_t>(b);
                 }
             }
-
-            pixels[x][y].red = uint8_t(red);
-            pixels[x][y].green = uint8_t(green);
-            pixels[x][y].blue = uint8_t(blue);
-        }
+        });
     }
+
+    for (auto &th : threads) {
+        th.join();
+    }
+
+    // Swap buffers
+    pixels.swap(newPixels);
 }
 
