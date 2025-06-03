@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #pragma pack(push, 1)  // Start byte-aligned packing
 
