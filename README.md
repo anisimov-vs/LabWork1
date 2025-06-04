@@ -26,6 +26,8 @@ It supports 1-, 8-, 16- and 24-bit both grayscale and colored images. Support of
 ### Build
 
 ```
+mkdir build && cd build
+cmake ..
 make
 ```
 
