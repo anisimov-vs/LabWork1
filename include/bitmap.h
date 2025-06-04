@@ -100,7 +100,7 @@ class Bitmap {
      * @param filename Path to the BMP file.
      * @return True on success, false on failure.
      */
-    bool load(const std::string &filename) const;
+    bool load(const std::string &filename);
 
     /**
      * @brief Writes the BMP image to a file.
