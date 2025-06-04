@@ -160,7 +160,7 @@ Arguments readArgs(int argc, char* argv[]) {
 }
 
 // Extract the image name from a full path
-std::string getImageName(std::string &imagePath) {
+std::string getImageName(const std::string &imagePath) {
     std::string token;
     std::istringstream tokenStream(imagePath);
     std::string imageName;
@@ -200,7 +200,7 @@ std::vector<std::vector<float> > generateGaussianKernel(int size, float sigma) {
     return kernel;
 }
 
-bool rotateAndSave(Bitmap &image, std::string imageName, bool clockwise, std::string outputPath) {
+bool rotateAndSave(Bitmap &image, const std::string &imageName, bool clockwise, const std::string &outputPath) {
     Bitmap rotatedImage = Bitmap(image);
 
     rotatedImage.rotate(clockwise);
