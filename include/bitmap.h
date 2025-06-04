@@ -100,14 +100,14 @@ class Bitmap {
      * @param filename Path to the BMP file.
      * @return True on success, false on failure.
      */
-    bool load(const std::string &filename); //
+    bool load(const std::string &filename) const;
 
     /**
      * @brief Writes the BMP image to a file.
      * @param filename Output file path.
      * @return True on success, false on failure.
      */
-    bool write(const std::string &filename);
+    bool write(const std::string &filename) const;
 
     /**
      * @brief Rotates the image 90 degrees.
@@ -130,6 +130,8 @@ class Bitmap {
      * @param endY Ending row index (exclusive).
      */
     void applyGaussianFilterThread(const std::vector<std::vector<float>>& kernel, int startY, int endY);
+
+    const std::vector<std::vector<Pixel>>& getPixels() const { return pixels; }
 };
 
 #endif
