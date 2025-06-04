@@ -53,4 +53,4 @@ If input_image, output_dir, num_threads, kernel_size or sigma are not provided, 
 
 ## License
 
-This project is provided as-is for educational purposes.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
