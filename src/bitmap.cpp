@@ -180,7 +180,7 @@ bool Bitmap::load(const std::string &fileName) {
 }
 
 // Write the BMP image to a file
-bool Bitmap::write(const std::string &fileName) {
+bool Bitmap::write(const std::string &fileName) const {
     std::ofstream file(fileName, std::ios::binary);
 
     if (!file) {

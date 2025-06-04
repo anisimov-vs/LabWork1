@@ -55,10 +55,10 @@ class Bitmap {
     ~Bitmap() { }
 
     // Method to load a bitmap from a file
-    bool load(const std::string &filename); //
+    bool load(const std::string &filename);
 
     // Method to write a bitmap to a file
-    bool write(const std::string &filename);
+    bool write(const std::string &filename) const;
 
     // Method to rotate the bitmap image
     void rotate(bool clockwise);
@@ -66,6 +66,8 @@ class Bitmap {
     // Method to apply a Gaussian filter to the bitmap image
     void applyGaussianFilter(const std::vector<std::vector<float>>& kernel, int numThreads);
     void applyGaussianFilterThread(const std::vector<std::vector<float>>& kernel, int startY, int endY);
+
+    const std::vector<std::vector<Pixel>>& getPixels() const { return pixels; }
 };
 
 #endif
