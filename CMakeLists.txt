@@ -35,6 +35,6 @@ add_custom_command(TARGET test_bitmap PRE_BUILD
 
 add_custom_command(TARGET test_bitmap POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_SOURCE_DIR}/24.bmp
+        ${CMAKE_SOURCE_DIR}/images/24.bmp
         ${CMAKE_BINARY_DIR}/24.bmp
 ) 

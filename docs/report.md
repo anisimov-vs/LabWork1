@@ -37,7 +37,7 @@ This report presents the parallelization of the Gaussian filter used in the BMP 
 
 ## 4. Discussion
 - **Speedup:** Roughly 2× from 1→2 threads, ~3.1× at 4 threads, ~3.8× at 8 threads.
-- **Diminishing Returns:** Overheads and memory contention limit scalability beyond 8 threads; slight slowdown at 16 threads likely due to hyperthreading overhead.
+- **Diminishing Returns:** Overheads and memory contention limit scalability beyond 8 threads.
 - **Amdahl's Law:** The filter portion is highly parallelizable, but I/O and thread startup contribute to serial costs.
 
 ## 5. Conclusion
@@ -54,8 +54,8 @@ make -j8
 
 Benchmark invocation:
 ```bash
-./bench.sh
-python3 plot_results.py
+./scripts/bench.sh
+python3 scripts/plot_results.py
 ```
 
 ### Source Files Modified

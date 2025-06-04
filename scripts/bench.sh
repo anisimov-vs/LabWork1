@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Benchmark settings
-EXEC=./main
-INPUT=big_image.bmp
+EXEC=./build/main
+INPUT=images/big_image.bmp
 OUTPUT_DIR=bench_results
 THREADS=(1 2 4 8 16)
 REPEATS=5
