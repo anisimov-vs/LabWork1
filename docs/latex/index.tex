@@ -1,0 +1,45 @@
+\chapter{Laboratory Work 1 }
+\hypertarget{index}{}\label{index}\index{Laboratory Work 1@{Laboratory Work 1}}
+\label{index_md__r_e_a_d_m_e}%
+\Hypertarget{index_md__r_e_a_d_m_e}%
+\hypertarget{index_autotoc_md1}{}\doxysection{\texorpdfstring{Author}{Author}}\label{index_autotoc_md1}
+Анисимов Василий Сергеевич, группа 24.Б81-\/мм\hypertarget{index_autotoc_md2}{}\doxysection{\texorpdfstring{Contacts}{Contacts}}\label{index_autotoc_md2}
+\href{mailto:st129629@student.spbu.ru}{\texttt{st129629@student.\+spbu.\+ru}}\hypertarget{index_autotoc_md3}{}\doxysection{\texorpdfstring{Description}{Description}}\label{index_autotoc_md3}
+This project is a C++ program that reads an image from a file, rotates it clockwise and counterclockwise, and applies a Gaussian filter to rotated images. The program then writes the rotated and filtered images to an output directory.
+
+It supports 1-\/, 8-\/, 16-\/ and 24-\/bit both grayscale and colored images. Support of 8-\/bit colored images is limited.\hypertarget{index_autotoc_md4}{}\doxysubsection{\texorpdfstring{Files}{Files}}\label{index_autotoc_md4}
+
+\begin{DoxyItemize}
+\item {\ttfamily src/main.\+cpp}\+: The main file containing the main function that reads an image from a file, rotates it clockwise and counterclockwise, and applies a Gaussian filter to rotated images.
+\item {\ttfamily \doxylink{bitmap_8h}{src/bitmap.\+h}}\+: The header file containing the structure definitions for the BMP file format and the \doxylink{class_bitmap}{Bitmap} class.
+\item {\ttfamily src/bitmap.\+cpp}\+: The implementation file containing the functions for reading, writing, rotating, and filtering images.
+\item {\ttfamily \doxylink{util_8h}{src/util.\+h}}\+: Header file containing utility functions for argument parsing, kernel generation, and image manipulation.
+\item {\ttfamily src/util.\+cpp}\+: Implementation file containing the utility functions defined in \doxylink{util_8h}{util.\+h}.
+\item {\ttfamily Makefile}\+: The makefile for building the program.
+\end{DoxyItemize}\hypertarget{index_autotoc_md5}{}\doxysubsection{\texorpdfstring{Build}{Build}}\label{index_autotoc_md5}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{make}
+
+\end{DoxyCode}
+\hypertarget{index_autotoc_md6}{}\doxysubsection{\texorpdfstring{Run}{Run}}\label{index_autotoc_md6}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{./main\ <input\ image\ path>}
+
+\end{DoxyCode}
+\hypertarget{index_autotoc_md7}{}\doxysubsection{\texorpdfstring{Usage}{Usage}}\label{index_autotoc_md7}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{Usage:\ main\ [options]\ [input\_image]\ [output\_dir]\ [num\_threads]\ [kernel\_size]\ [sigma]}
+\DoxyCodeLine{Options:}
+\DoxyCodeLine{\ \ -\/i\ <input\_image>\ \ \ \ \ Specify\ the\ input\ image\ file\ \ (default:\ image.bmp)}
+\DoxyCodeLine{\ \ -\/o\ <output\_dir>\ \ \ \ \ \ Specify\ the\ output\ directory\ \ (default:\ output/)}
+\DoxyCodeLine{\ \ -\/n\ <num\_threads>\ \ \ \ \ Specify\ the\ number\ of\ threads\ (default:\ best\ possible)}
+\DoxyCodeLine{\ \ -\/k\ <kernel\_size>\ \ \ \ \ Specify\ the\ kernel\ size\ (default:\ 5)}
+\DoxyCodeLine{\ \ -\/s\ <sigma>\ \ \ \ \ \ \ \ \ \ \ Specify\ the\ sigma\ (default:\ 1.0)}
+\DoxyCodeLine{\ \ -\/h\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Display\ this\ help\ message}
+\DoxyCodeLine{If\ input\_image,\ output\_dir,\ num\_threads,\ kernel\_size\ or\ sigma\ are\ not\ provided,\ default\ values\ are\ used.}
+
+\end{DoxyCode}
+ 

@@ -1,0 +1,67 @@
+\doxysection{Arguments Struct Reference}
+\hypertarget{struct_arguments}{}\label{struct_arguments}\index{Arguments@{Arguments}}
+
+
+Stores command-\/line argument values for the application.  
+
+
+
+
+{\ttfamily \#include $<$util.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{struct_arguments_a92cdddbf628cd14c8c29b31f1e7e1c53}{input\+Image}} = "{}image.\+bmp"{}
+\item 
+std\+::string \mbox{\hyperlink{struct_arguments_a52d13dcaf8a0437e58d43d2dd1553061}{output\+Dir}} = "{}output/"{}
+\item 
+int \mbox{\hyperlink{struct_arguments_a8f973451210de315b0fcdfbac50f51c2}{num\+Threads}} = 0
+\item 
+int \mbox{\hyperlink{struct_arguments_ac6c22ec6fda1717fa896da5be15b81d9}{kernel\+Size}} = 5
+\item 
+float \mbox{\hyperlink{struct_arguments_a6ecf6ae002ef0b1d6d8dde41b97c895d}{sigma}} = 1.\+0
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Stores command-\/line argument values for the application. 
+
+\label{doc-variable-members}
+\Hypertarget{struct_arguments_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{struct_arguments_a92cdddbf628cd14c8c29b31f1e7e1c53}\index{Arguments@{Arguments}!inputImage@{inputImage}}
+\index{inputImage@{inputImage}!Arguments@{Arguments}}
+\doxysubsubsection{\texorpdfstring{inputImage}{inputImage}}
+{\footnotesize\ttfamily \label{struct_arguments_a92cdddbf628cd14c8c29b31f1e7e1c53} 
+std\+::string Arguments\+::input\+Image = "{}image.\+bmp"{}}
+
+Input image file path. \Hypertarget{struct_arguments_ac6c22ec6fda1717fa896da5be15b81d9}\index{Arguments@{Arguments}!kernelSize@{kernelSize}}
+\index{kernelSize@{kernelSize}!Arguments@{Arguments}}
+\doxysubsubsection{\texorpdfstring{kernelSize}{kernelSize}}
+{\footnotesize\ttfamily \label{struct_arguments_ac6c22ec6fda1717fa896da5be15b81d9} 
+int Arguments\+::kernel\+Size = 5}
+
+Size of the Gaussian kernel (odd value). \Hypertarget{struct_arguments_a8f973451210de315b0fcdfbac50f51c2}\index{Arguments@{Arguments}!numThreads@{numThreads}}
+\index{numThreads@{numThreads}!Arguments@{Arguments}}
+\doxysubsubsection{\texorpdfstring{numThreads}{numThreads}}
+{\footnotesize\ttfamily \label{struct_arguments_a8f973451210de315b0fcdfbac50f51c2} 
+int Arguments\+::num\+Threads = 0}
+
+Number of threads to use for filtering. \Hypertarget{struct_arguments_a52d13dcaf8a0437e58d43d2dd1553061}\index{Arguments@{Arguments}!outputDir@{outputDir}}
+\index{outputDir@{outputDir}!Arguments@{Arguments}}
+\doxysubsubsection{\texorpdfstring{outputDir}{outputDir}}
+{\footnotesize\ttfamily \label{struct_arguments_a52d13dcaf8a0437e58d43d2dd1553061} 
+std\+::string Arguments\+::output\+Dir = "{}output/"{}}
+
+Output directory path (must end with \textquotesingle{}/\textquotesingle{}). \Hypertarget{struct_arguments_a6ecf6ae002ef0b1d6d8dde41b97c895d}\index{Arguments@{Arguments}!sigma@{sigma}}
+\index{sigma@{sigma}!Arguments@{Arguments}}
+\doxysubsubsection{\texorpdfstring{sigma}{sigma}}
+{\footnotesize\ttfamily \label{struct_arguments_a6ecf6ae002ef0b1d6d8dde41b97c895d} 
+float Arguments\+::sigma = 1.\+0}
+
+Sigma value for the Gaussian kernel. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\mbox{\hyperlink{util_8h}{util.\+h}}\end{DoxyCompactItemize}

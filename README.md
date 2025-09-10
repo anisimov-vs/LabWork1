@@ -26,6 +26,8 @@ It supports 1-, 8-, 16- and 24-bit both grayscale and colored images. Support of
 ### Build
 
 ```
+mkdir build && cd build
+cmake ..
 make
 ```
 
@@ -48,3 +50,7 @@ Options:
   -h                   Display this help message
 If input_image, output_dir, num_threads, kernel_size or sigma are not provided, default values are used.
 ```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

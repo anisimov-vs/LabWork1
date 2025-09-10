@@ -1,0 +1,115 @@
+\doxysection{bmp\+File\+Dib\+Info Struct Reference}
+\hypertarget{structbmp_file_dib_info}{}\label{structbmp_file_dib_info}\index{bmpFileDibInfo@{bmpFileDibInfo}}
+
+
+Represents the BMP DIB header (BITMAPINFOHEADER).  
+
+
+
+
+{\ttfamily \#include $<$bitmap.\+h$>$}
+
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_a50bcfac6c56b5ea2a4e0be903b16f0a0}{header\+Size}}
+\item 
+int32\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_a297f102b183bf37da96d6315cf41c565}{width}}
+\item 
+int32\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_ad98b740d4222e2525e228f163d46871c}{height}}
+\item 
+uint16\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_aa04f51172e2292336f682329b82e27c6}{planes}}
+\item 
+uint16\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_a99f26f427204eeefbf368d738b217479}{bits\+Per\+Pixel}}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_a0b9a682527aec1c215f323cd664a6e82}{compression}}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_ae6783a1843dca59d7215fe1b31efc30e}{image\+Size}}
+\item 
+int32\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_a4571e548c25ff6255f3ebd9280518f85}{x\+Pixels\+Per\+Meter}}
+\item 
+int32\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_ade2d64fab1607323f030b08ae3bc0f89}{y\+Pixels\+Per\+Meter}}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_a0a057a99468f08958e81a806051f1d51}{colors\+Used}}
+\item 
+uint32\+\_\+t \mbox{\hyperlink{structbmp_file_dib_info_abf59868ca4e898262110d44d4e15ea30}{important\+Colors}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Represents the BMP DIB header (BITMAPINFOHEADER). 
+
+\label{doc-variable-members}
+\Hypertarget{structbmp_file_dib_info_doc-variable-members}
+\doxysubsection{Member Data Documentation}
+\Hypertarget{structbmp_file_dib_info_a99f26f427204eeefbf368d738b217479}\index{bmpFileDibInfo@{bmpFileDibInfo}!bitsPerPixel@{bitsPerPixel}}
+\index{bitsPerPixel@{bitsPerPixel}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{bitsPerPixel}{bitsPerPixel}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_a99f26f427204eeefbf368d738b217479} 
+uint16\+\_\+t bmp\+File\+Dib\+Info\+::bits\+Per\+Pixel}
+
+Bits per pixel (e.\+g., 24 for RGB). \Hypertarget{structbmp_file_dib_info_a0a057a99468f08958e81a806051f1d51}\index{bmpFileDibInfo@{bmpFileDibInfo}!colorsUsed@{colorsUsed}}
+\index{colorsUsed@{colorsUsed}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{colorsUsed}{colorsUsed}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_a0a057a99468f08958e81a806051f1d51} 
+uint32\+\_\+t bmp\+File\+Dib\+Info\+::colors\+Used}
+
+Number of colors in the palette. \Hypertarget{structbmp_file_dib_info_a0b9a682527aec1c215f323cd664a6e82}\index{bmpFileDibInfo@{bmpFileDibInfo}!compression@{compression}}
+\index{compression@{compression}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{compression}{compression}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_a0b9a682527aec1c215f323cd664a6e82} 
+uint32\+\_\+t bmp\+File\+Dib\+Info\+::compression}
+
+Compression method being used. \Hypertarget{structbmp_file_dib_info_a50bcfac6c56b5ea2a4e0be903b16f0a0}\index{bmpFileDibInfo@{bmpFileDibInfo}!headerSize@{headerSize}}
+\index{headerSize@{headerSize}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{headerSize}{headerSize}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_a50bcfac6c56b5ea2a4e0be903b16f0a0} 
+uint32\+\_\+t bmp\+File\+Dib\+Info\+::header\+Size}
+
+Size of this header in bytes. \Hypertarget{structbmp_file_dib_info_ad98b740d4222e2525e228f163d46871c}\index{bmpFileDibInfo@{bmpFileDibInfo}!height@{height}}
+\index{height@{height}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{height}{height}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_ad98b740d4222e2525e228f163d46871c} 
+int32\+\_\+t bmp\+File\+Dib\+Info\+::height}
+
+Image height in pixels. \Hypertarget{structbmp_file_dib_info_ae6783a1843dca59d7215fe1b31efc30e}\index{bmpFileDibInfo@{bmpFileDibInfo}!imageSize@{imageSize}}
+\index{imageSize@{imageSize}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{imageSize}{imageSize}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_ae6783a1843dca59d7215fe1b31efc30e} 
+uint32\+\_\+t bmp\+File\+Dib\+Info\+::image\+Size}
+
+Size of the raw bitmap data (including padding). \Hypertarget{structbmp_file_dib_info_abf59868ca4e898262110d44d4e15ea30}\index{bmpFileDibInfo@{bmpFileDibInfo}!importantColors@{importantColors}}
+\index{importantColors@{importantColors}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{importantColors}{importantColors}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_abf59868ca4e898262110d44d4e15ea30} 
+uint32\+\_\+t bmp\+File\+Dib\+Info\+::important\+Colors}
+
+Number of important colors. \Hypertarget{structbmp_file_dib_info_aa04f51172e2292336f682329b82e27c6}\index{bmpFileDibInfo@{bmpFileDibInfo}!planes@{planes}}
+\index{planes@{planes}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{planes}{planes}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_aa04f51172e2292336f682329b82e27c6} 
+uint16\+\_\+t bmp\+File\+Dib\+Info\+::planes}
+
+Number of color planes (must be 1). \Hypertarget{structbmp_file_dib_info_a297f102b183bf37da96d6315cf41c565}\index{bmpFileDibInfo@{bmpFileDibInfo}!width@{width}}
+\index{width@{width}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{width}{width}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_a297f102b183bf37da96d6315cf41c565} 
+int32\+\_\+t bmp\+File\+Dib\+Info\+::width}
+
+Image width in pixels. \Hypertarget{structbmp_file_dib_info_a4571e548c25ff6255f3ebd9280518f85}\index{bmpFileDibInfo@{bmpFileDibInfo}!xPixelsPerMeter@{xPixelsPerMeter}}
+\index{xPixelsPerMeter@{xPixelsPerMeter}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{xPixelsPerMeter}{xPixelsPerMeter}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_a4571e548c25ff6255f3ebd9280518f85} 
+int32\+\_\+t bmp\+File\+Dib\+Info\+::x\+Pixels\+Per\+Meter}
+
+Horizontal resolution (pixels per meter). \Hypertarget{structbmp_file_dib_info_ade2d64fab1607323f030b08ae3bc0f89}\index{bmpFileDibInfo@{bmpFileDibInfo}!yPixelsPerMeter@{yPixelsPerMeter}}
+\index{yPixelsPerMeter@{yPixelsPerMeter}!bmpFileDibInfo@{bmpFileDibInfo}}
+\doxysubsubsection{\texorpdfstring{yPixelsPerMeter}{yPixelsPerMeter}}
+{\footnotesize\ttfamily \label{structbmp_file_dib_info_ade2d64fab1607323f030b08ae3bc0f89} 
+int32\+\_\+t bmp\+File\+Dib\+Info\+::y\+Pixels\+Per\+Meter}
+
+Vertical resolution (pixels per meter). 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\mbox{\hyperlink{bitmap_8h}{bitmap.\+h}}\end{DoxyCompactItemize}
